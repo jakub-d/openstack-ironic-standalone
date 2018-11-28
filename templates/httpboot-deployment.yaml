@@ -48,7 +48,7 @@ spec:
             - cp
             - "/usr/share/syslinux/pxelinux.0"
             - "/usr/share/ipxe/ipxe.efi"
-            - "/usr/share/ipxe/custom-ipxe.efi"
+            - "/usr/share/syslinux/custom-ipxe.efi"
             - "/tftpboot/"
           securityContext:
             runAsUser: 0
