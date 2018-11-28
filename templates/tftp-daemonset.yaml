@@ -11,14 +11,12 @@ spec:
   selector:
     matchLabels:
       app: {{ template "openstackIronicStandalone.name" . }}
-      chart: {{ .Chart.Name }}-{{ .Chart.Version }}
       component: "{{ .Values.tftp.name }}"
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
         app: {{ template "openstackIronicStandalone.name" . }}
-        chart: {{ .Chart.Name }}-{{ .Chart.Version }}
         component: "{{ .Values.tftp.name }}"
         release: {{ .Release.Name }}
       name: {{ template "openstackIronicStandalone.tftp.fullname" . }}

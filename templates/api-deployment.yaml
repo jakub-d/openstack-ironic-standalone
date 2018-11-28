@@ -14,7 +14,6 @@ spec:
     metadata:
       labels:
         app: {{ template "openstackIronicStandalone.name" . }}
-        chart: {{ .Chart.Name }}-{{ .Chart.Version }}
         component: "{{ .Values.api.name }}"
         release: {{ .Release.Name }}
       name: {{ template "openstackIronicStandalone.api.fullname" . }}
