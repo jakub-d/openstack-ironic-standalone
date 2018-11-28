@@ -1,7 +1,7 @@
 Helm Chart - Openstack Ironic Standalone
 ========================================
 
-https://travis-ci.org/jakub-d/openstack-ironic-standalone.svg?branch=master
+[![Build Status](https://travis-ci.org/jakub-d/openstack-ironic-standalone.svg?branch=master)](https://travis-ci.org/jakub-d/openstack-ironic-standalone)
 
 [Openstack Ironic](https://docs.openstack.org/ironic/latest/index.html), Ironic is an OpenStack project which provisions bare metal (as opposed to virtual) machines. It may be used independently or as part of an OpenStack Cloud, and integrates with the OpenStack Identity (keystone), Compute (nova), Network (neutron), Image (glance), and Object (swift) services.
 
@@ -36,7 +36,7 @@ rabbitmq:
 Then install a chart using command:
 ```
 helm repo add ironic https://ironic.storage.googleapis.com
-helm install ironic/openstack-standalone-ironic -f my-site.yaml
+helm install ironic/openstack-ironic-standalone -f my-site.yaml
 ```
 
 Configuration
