@@ -1,6 +1,8 @@
 Helm Chart - Openstack Ironic Standalone
 ========================================
 
+https://travis-ci.org/jakub-d/openstack-ironic-standalone.svg?branch=master
+
 [Openstack Ironic](https://docs.openstack.org/ironic/latest/index.html), Ironic is an OpenStack project which provisions bare metal (as opposed to virtual) machines. It may be used independently or as part of an OpenStack Cloud, and integrates with the OpenStack Identity (keystone), Compute (nova), Network (neutron), Image (glance), and Object (swift) services.
 
 This Helm chart installs Openstack Ironic in [standalone mode](https://docs.openstack.org/ironic/latest/install/standalone.html).

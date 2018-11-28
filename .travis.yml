@@ -31,4 +31,4 @@ deploy:
   local-dir: build
   on:
     repo: jakub-d/openstack-ironic-standalone
-    branch: travis
+    branch: master
