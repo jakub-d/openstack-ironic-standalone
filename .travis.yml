@@ -1,0 +1,34 @@
+---
+language: python
+
+env:
+  global:
+    - CHARTS_URL=https://ironic.storage.googleapis.com/
+    - HELM_URL=https://storage.googleapis.com/kubernetes-helm
+    - HELM_TGZ=helm-v2.11.0-linux-amd64.tar.gz
+
+install:
+  # Installing Helm
+  - wget -q ${HELM_URL}/${HELM_TGZ}
+  - tar xzfv ${HELM_TGZ}
+  - rm -f ${HELM_TGZ}
+  - PATH=`pwd`/linux-amd64/:$PATH
+  - helm init --client-only
+
+script:
+  - mkdir -p build
+  - helm package --destination build --dependency-update .
+  - wget -q https://ironic.storage.googleapis.com/index.yaml
+  - helm repo index --url ${CHARTS_URL} --merge index.yaml build/
+
+deploy:
+  skip_cleanup: true
+  provider: gcs
+  access_key_id: GOOGESEWMWEMKTQRGSAGYXDB
+  secret_access_key:
+    secure: CFGPeOPK2A47YqjWwFDRt4ymPqzqUJjLudSe1N5d9I9i599rWAUDOfUlhn+EnNsIjgcMiqu/mkzfQMNy46WCWjACzmN0v5W5D3/AKxFIItOMWKsCXXwKwa4yGOJgysi6S7S5i2u8QrsVNy9tZelcgTmR1DfaCA0Rkjn/bSRS8/KHCstSMFNxzFq6FHyN6rL6jRG2qCFHKyMHX7247uNAm+J5PkyRCVlKX4XfSPdKs0Hbq+gjH+1iEg8owYN7xrKuA+SouF9qr2vhLTgvqDcaIGCw2esnWEDcMxVnxuz+0JejwYVY7d6GeRlZb277aOY9P2jeZwW5dPNFNiDbrHA6IhdU0RiClYLLQK0M3f0A/z7hY/4txl275gZJyMHKlSbfV2/j3WG76a7BmobZdRvD0W3sEcsR5b4BctbmFENGfj0QNTlX7j3dJr0vPLX0HPvz6hHEOYLM+epJJyXQu+c5j08Fokwqe7m2lYbN0NaGEzTpHLZb9eOhTAf0ECSOUOsygfEoz71N6xkQoxGq7QrG8gacW3Te+Q/VM1xntwCNa3ebrAnmhDZQD1hH9yWTu2OigBKJZWkEQBaUA61WSriwSdSKMNgJFRymL48/SuzUllp+Ni4F3yk9xWujYucy9nRMOhslNmpyP/TFD/Gt0sWpRCf1NgNghgbRyklNnm5QDTw=
+  bucket: ironic
+  local-dir: build
+  on:
+    repo: jakub-d/openstack-ironic-standalone
+    branch: travis

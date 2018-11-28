@@ -19,3 +19,6 @@
 .project
 .idea/
 *.tmproj
+# Travis CI
+linux-amd64
+.travis.yml

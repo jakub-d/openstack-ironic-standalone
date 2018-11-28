@@ -33,7 +33,8 @@ rabbitmq:
 
 Then install a chart using command:
 ```
-helm install incubator/openstack-standalone-ironic -f my-site.yaml
+helm repo add ironic https://ironic.storage.googleapis.com
+helm install ironic/openstack-standalone-ironic -f my-site.yaml
 ```
 
 Configuration
