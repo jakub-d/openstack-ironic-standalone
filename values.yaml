@@ -30,12 +30,12 @@ config:
     erase_devices_metadata_priority: 0
     power_off_after_deploy_failure: false
   conductor:
-    heartbeat_interval: 30
-    heartbeat_timeout: 300
-    deploy_callback_timeout: 3600
-    power_state_sync_max_retries: 32
+    heartbeat_interval: 10
+    heartbeat_timeout: 30
+    deploy_callback_timeout: 1800
+    power_state_sync_max_retries: 3
     automated_clean: false
-    clean_callback_timeout: 3600
+    clean_callback_timeout: 1800
 
 api:
   ## Ironic API container name

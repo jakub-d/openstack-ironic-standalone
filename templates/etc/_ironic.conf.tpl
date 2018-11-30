@@ -44,7 +44,7 @@ auth_strategy = noauth
 # hardware types present on your system may be found by
 # enumerating the "ironic.hardware.types" entrypoint. (list
 # value)
-enabled_hardware_types =  {{ .Values.config.default.enabled_hardware_types | default "ipmi" }}
+enabled_hardware_types =  {{ .Values.config.default.enabled_hardware_types }}
 
 # Specify the list of bios interfaces to load during service
 # initialization. Missing bios interfaces, or bios interfaces
@@ -449,7 +449,7 @@ enabled_network_interfaces = noop
 # If set to true, the logging level will be set to DEBUG
 # instead of the default INFO level. (boolean value)
 # Note: This option can be changed without restarting.
-debug = {{ .Values.config.default.debug | default false }}
+debug = {{ .Values.config.default.debug }}
 
 # The name of a logging configuration file. This file is
 # appended to any existing logging configuration files. For
@@ -1033,7 +1033,7 @@ port = {{ .Values.api.portInternal }}
 # default is equal to the number of CPUs available if that can
 # be determined, else a default worker count of 1 is returned.
 # (integer value)
-api_workers =  {{ .Values.config.api.api_workers | default "1" }}
+api_workers =  {{ .Values.config.api.api_workers }}
 
 # Enable the integrated stand-alone API to service requests
 # via HTTPS instead of HTTP. If there is a front-end service
@@ -1271,7 +1271,7 @@ api_workers =  {{ .Values.config.api.api_workers | default "1" }}
 # workers_pool_size = 100
 
 # Seconds between conductor heart beats. (integer value)
-heartbeat_interval = {{ .Values.config.conductor.heartbeat_interval | default "10" }}
+heartbeat_interval = {{ .Values.config.conductor.heartbeat_interval }}
 
 # DEPRECATED: URL of Ironic API service. If not set ironic can
 # get the current value from the keystone service catalog. If
@@ -1287,7 +1287,7 @@ api_url = http://{{ .Values.api.externalIPs | first }}:{{ .Values.api.portExtern
 # Maximum time (in seconds) since the last check-in of a
 # conductor. A conductor is considered inactive when this time
 # has been exceeded. (integer value)
-heartbeat_timeout = {{ .Values.config.conductor.heartbeat_timeout | default "30" }}
+heartbeat_timeout = {{ .Values.config.conductor.heartbeat_timeout }}
 
 # Interval between syncing the node power state to the
 # database, in seconds. (integer value)
@@ -1304,7 +1304,7 @@ heartbeat_timeout = {{ .Values.config.conductor.heartbeat_timeout | default "30"
 
 # Timeout (seconds) to wait for a callback from a deploy
 # ramdisk. Set to 0 to disable timeout. (integer value)
-deploy_callback_timeout = {{ .Values.config.conductor.deploy_callback_timeout | default "1800" }}
+deploy_callback_timeout = {{ .Values.config.conductor.deploy_callback_timeout }}
 
 # During sync_power_state, should the hardware power state be
 # set to the state recorded in the database (True) or should
@@ -1315,7 +1315,7 @@ deploy_callback_timeout = {{ .Values.config.conductor.deploy_callback_timeout | 
 # During sync_power_state failures, limit the number of times
 # Ironic should try syncing the hardware node power state with
 # the node power state in DB (integer value)
-power_state_sync_max_retries = {{ .Values.config.conductor.power_state_sync_max_retries | default "3" }}
+power_state_sync_max_retries = {{ .Values.config.conductor.power_state_sync_max_retries }}
 
 # Maximum number of worker threads that can be started
 # simultaneously by a periodic task. Should be less than RPC
@@ -1383,13 +1383,13 @@ power_state_sync_max_retries = {{ .Values.config.conductor.power_state_sync_max_
 # significantly longer. In an environment where all tenants
 # are trusted (eg, because there is only one tenant), this
 # option could be safely disabled. (boolean value)
-automated_clean = {{ .Values.config.conductor.automated_clean | default true }}
+automated_clean = {{ .Values.config.conductor.automated_clean }}
 
 # Timeout (seconds) to wait for a callback from the ramdisk
 # doing the cleaning. If the timeout is reached the node will
 # be put in the "clean failed" provision state. Set to 0 to
 # disable timeout. (integer value)
-clean_callback_timeout = {{ .Values.config.conductor.clean_callback_timeout | default "1800" }}
+clean_callback_timeout = {{ .Values.config.conductor.clean_callback_timeout }}
 
 # Timeout (seconds) to wait for a callback from the rescue
 # ramdisk. If the timeout is reached the node will be put in
@@ -1646,7 +1646,7 @@ http_root = /storage/httpboot
 
 # Whether to support the use of ATA Secure Erase during the
 # cleaning process. Defaults to True. (boolean value)
-enable_ata_secure_erase = {{ .Values.config.deploy.enable_ata_secure_erase | default true }}
+enable_ata_secure_erase = {{ .Values.config.deploy.enable_ata_secure_erase }}
 
 # Priority to run in-band erase devices via the Ironic Python
 # Agent ramdisk. If unset, will use the priority set in the
@@ -1683,7 +1683,7 @@ erase_devices_metadata_priority = {{ .Values.config.deploy.erase_devices_metadat
 
 # Whether to power off a node after deploy failure. Defaults
 # to True. (boolean value)
-power_off_after_deploy_failure = {{ .Values.config.deploy.power_off_after_deploy_failure | default true }}
+power_off_after_deploy_failure = {{ .Values.config.deploy.power_off_after_deploy_failure }}
 
 # Default boot option to use when no boot option is requested
 # in node's driver_info. Currently the default is "netboot",
@@ -3974,7 +3974,7 @@ dhcp_provider = none
 
 # Additional append parameters for baremetal PXE boot. (string
 # value)
-pxe_append_params = {{ .Values.config.pxe.pxe_append_params | default "nofb nomodeset vga=normal" }}
+pxe_append_params = {{ .Values.config.pxe.pxe_append_params }}
 
 # Default file system format for ephemeral partition, if one
 # is created. (string value)
@@ -4058,7 +4058,7 @@ tftp_master_path = /storage/tftpboot/master-path
 #pxe_bootfile_name_by_arch =
 
 # Enable iPXE boot. (boolean value)
-ipxe_enabled = {{ .Values.config.pxe.ipxe_enabled | default false }}
+ipxe_enabled = {{ .Values.config.pxe.ipxe_enabled }}
 
 # On ironic-conductor node, the path to the main iPXE script
 # file. (string value)
