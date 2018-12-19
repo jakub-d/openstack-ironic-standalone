@@ -60,8 +60,10 @@ spec:
       containers:
       - name: {{ template "openstackIronicStandalone.fullname" . }}-{{ .Values.httpboot.name }}
         image:  "{{ .Values.httpboot.image.name }}:{{ .Values.httpboot.image.version }}"
+      {{- with .Values.httpboot.resources }}
         resources:
-{{ toYaml .Values.httpboot.resources | indent 10 }}
+{{ toYaml . | indent 10 }}
+      {{- end }}
         ports:
         - containerPort: 80
         volumeMounts:

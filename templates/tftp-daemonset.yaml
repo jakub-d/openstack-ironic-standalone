@@ -53,8 +53,10 @@ spec:
             - mountPath: /dev/log
               name: devlog
               readOnly: false
+        {{- with .Values.tftp.resources }}
           resources:
-{{ toYaml .Values.tftp.resources | indent 12 }}
+{{ toYaml . | indent 12 }}
+        {{- end }}
       volumes:
         - name: ironic
           persistentVolumeClaim:

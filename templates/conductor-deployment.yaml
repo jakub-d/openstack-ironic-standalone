@@ -24,8 +24,10 @@ spec:
         - name: {{ template "openstackIronicStandalone.name" . }}-{{ .Values.conductor.name }}
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
           imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        {{- with .Values.conductor.resources }}
           resources:
-{{ toYaml .Values.conductor.resources | indent 12 }}
+{{ toYaml . | indent 12 }}
+        {{- end }}
           command:
             - /usr/bin/ironic-conductor
           args:

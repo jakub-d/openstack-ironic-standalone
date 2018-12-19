@@ -30,8 +30,10 @@ spec:
         - name: {{ template "openstackIronicStandalone.name" . }}-{{ .Values.api.name }}
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
           imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        {{- with .Values.api.resources }}
           resources:
-{{ toYaml .Values.api.resources | indent 12 }}
+{{ toYaml . | indent 12 }}
+        {{- end }}
           command:
             - /usr/bin/ironic-api
           args:
