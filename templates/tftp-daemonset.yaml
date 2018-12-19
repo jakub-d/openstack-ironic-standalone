@@ -25,6 +25,10 @@ spec:
         runAsUser: 0
         fsGroup: 0
       hostNetwork: true
+    {{- with .Values.tftp.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       containers:
         - name: {{ template "openstackIronicStandalone.fullname" . }}-{{ .Values.tftp.name }}
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
