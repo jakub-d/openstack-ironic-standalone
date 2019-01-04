@@ -35,10 +35,36 @@ spec:
 {{ toYaml . | indent 12 }}
         {{- end }}
           command:
-            - /usr/bin/ironic-api
+            - /bin/sh
           args:
-            - --config-file
-            - /etc/ironic/ironic.conf
+            - -c
+            - mako-render /etc/ironic/ironic.conf.mako >/tmp/ironic.conf; /usr/bin/ironic-api --config-file /tmp/ironic.conf
+          env:
+            - name: API_PORT_INTERNAL
+              value: {{ .Values.api.portInternal }}
+            {{- if .Values.rabbitmq.enabled }}
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "openstackIronicStandalone.name" . }}-rabbitmq
+                  key: rabbitmq-password
+            - name: RABBITMQ_ERLANG_COOKIE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "openstackIronicStandalone.name" . }}-rabbitmq
+                  key: rabbitmq-erlang-cookie
+            {{- end }}
+            {{- if .Values.mysql.enabled }}
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "openstackIronicStandalone.name" . }}-mysql
+                  {{- if .Values.mysql.mysqlUser }}
+                  key: mysql-password
+                  {{- else }}
+                  key: mysql-root-password
+                  {{- end }}
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /

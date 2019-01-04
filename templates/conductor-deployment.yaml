@@ -35,7 +35,7 @@ spec:
             - /etc/ironic/ironic.conf
           env:
             - name: IRONIC_URL
-              value: "http://{{ .Release.Name }}-ironic-api:{{ .Values.api.portExternal }}/"
+              value: "http://{{ .Release.Name }}-ironic-{{ .Values.api.name }}:{{ .Values.api.portExternal }}/"
             - name: OS_AUTH_TOKEN
               value: "fake-token"
 #          livenessProbe:

@@ -8,6 +8,6 @@ metadata:
     release: {{ .Release.Name }}
   name: {{ template "openstackIronicStandalone.name" . }}-etc
 data:
-  ironic.conf: |
+  ironic.conf.mako: |
 {{ include (print .Template.BasePath "/etc/_ironic.conf.tpl") . | indent 4 }}
 {{ (.Files.Glob "static-config/*").AsConfig | indent 2 }}

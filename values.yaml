@@ -15,20 +15,13 @@ persistentVolumeClaimName: DEFINE-EXISTING-PV-CLAIM
 ## If you need more, please extract and create PR.
 ##
 config:
-  default:
+  DEFAULT:
     debug: false
     enabled_hardware_types: ipmi
+    auth_strategy: noauth
+    enabled_network_interfaces: noop
   api:
     api_workers: 8
-  pxe:
-    pxe_append_params: "console=tty0 console=ttyS0,115200 coreos.autologin=tty0"
-    ipxe_boot_script: $pybasedir/drivers/modules/boot.ipxe
-    ipxe_enabled: false
-  deploy:
-    enable_ata_secure_erase: false
-    erase_devices_priority: 0
-    erase_devices_metadata_priority: 0
-    power_off_after_deploy_failure: false
   conductor:
     heartbeat_interval: 10
     heartbeat_timeout: 30
@@ -36,6 +29,27 @@ config:
     power_state_sync_max_retries: 3
     automated_clean: false
     clean_callback_timeout: 1800
+  database: {}
+  deploy:
+    enable_ata_secure_erase: false
+    erase_devices_priority: 0
+    erase_devices_metadata_priority: 0
+    power_off_after_deploy_failure: false
+    http_root: /storage/httpboot
+  dhcp:
+    dhcp_provider: none
+  pxe:
+    images_path: /storage/httpboot/images
+    instance_master_path: /storage/httpboot/master-path
+    tftp_root: /storage/tftpboot
+    tftp_master_path: /storage/tftpboot/master-path
+    pxe_append_params: "console=tty0 console=ttyS0,115200 coreos.autologin=tty0"
+    ipxe_boot_script: $pybasedir/drivers/modules/boot.ipxe
+    ## to enable ipxe, replace values of both following keys
+    ipxe_enabled: false
+    pxe_config_template: $pybasedir/drivers/modules/pxe_config.template
+    # ipxe_enabled: true
+    # pxe_config_template: $pybasedir/drivers/modules/ipxe_config.template
 
 api:
   ## Ironic API container name
@@ -155,6 +169,7 @@ conductor:
       cpu: "8"
 
 mysql:
+  enabled: true
   image: mysql
   imageTag: "5.7.14"
   mysqlUser: ironic
@@ -176,6 +191,7 @@ mysql:
       cpu: 100m
 
 rabbitmq:
+  enabled: true
   replicas: 1
   rabbitmq:
     username: rabbitmq
