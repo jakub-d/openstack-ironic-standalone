@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  name: {{ include "openstackIronicStandalone.httpboot.fullname" . }}
   labels:
-    app: {{ template "openstackIronicStandalone.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    component: "{{ .Values.httpboot.name }}"
+    app: {{ include "openstackIronicStandalone.name" . }}
+    chart: {{ include "openstackIronicStandalone.chart" . }}
+    component: {{ .Values.httpboot.name }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
-  name: {{ template "openstackIronicStandalone.httpboot.fullname" . }}
 data:
  nginx.conf: |
 {{ include (print .Template.BasePath "/etc/_nginx.conf.tpl") . | indent 4 }}

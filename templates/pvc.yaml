@@ -1,20 +1,19 @@
 {{- range $index, $entry := tuple .Values.tftp.name }}
 {{- if and (index $.Values $entry).persistence.enabled (not $.Values.persistentVolumeClaimName) }}
 ---
-kind: PersistentVolumeClaim
 apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
   name: {{ include (printf "openstackIronicStandalone.%v.fullname" $entry) $ }}
-
-{{- with (index $.Values $entry).persistence.annotations  }}
+  labels:
+    app: {{ include "openstackIronicStandalone.name" $ }}
+    chart: {{ include "openstackIronicStandalone.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+{{- with (index $.Values $entry).persistence.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
-  labels:
-    app: {{ include (printf "openstackIronicStandalone.%v.fullname" $entry) $ }}
-    chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
-    release: "{{ $.Release.Name }}"
-    heritage: "{{ $.Release.Service }}"
 spec:
   accessModes:
     - {{ (index $.Values $entry).persistence.accessMode | quote }}
@@ -25,7 +24,7 @@ spec:
 {{- if (eq "-" (index $.Values $entry).persistence.storageClass) }}
   storageClassName: ""
 {{- else }}
-  storageClassName: "{{ (index $.Values $entry).persistence.storageClass }}"
+  storageClassName: {{ (index $.Values $entry).persistence.storageClass | quote }}
 {{- end }}
 {{- end }}
 {{- end }}

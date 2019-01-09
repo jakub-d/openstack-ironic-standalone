@@ -2,21 +2,21 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   labels:
-    app: {{ template "openstackIronicStandalone.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app: {{ include "openstackIronicStandalone.name" . }}
+    chart: {{ include "openstackIronicStandalone.chart" . }}
     component: {{ .Values.httpboot.name }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
-  name: {{ template "openstackIronicStandalone.httpboot.fullname" . }}
+  name: {{ include "openstackIronicStandalone.httpboot.fullname" . }}
 spec:
   replicas: {{ .Values.httpboot.replicas }}
   template:
     metadata:
       labels:
-        app: {{ template "openstackIronicStandalone.name" . }}
+        app: {{ include "openstackIronicStandalone.name" . }}
         component: "{{ .Values.httpboot.name }}"
         release: {{ .Release.Name }}
-      name: {{ template "openstackIronicStandalone.httpboot.fullname" . }}
+      name: {{ include "openstackIronicStandalone.httpboot.fullname" . }}
       annotations:
         configmap-etc-hash: {{ include (print $.Template.BasePath "/httpboot-configmap.yaml") . | sha256sum }}
     spec:
@@ -54,14 +54,15 @@ spec:
               name: ironic
               subPath: tftpboot
       containers:
-      - name: {{ template "openstackIronicStandalone.httpboot.fullname" . }}
+      - name: {{ include "openstackIronicStandalone.httpboot.fullname" . }}
         image:  "{{ .Values.httpboot.image.name }}:{{ .Values.httpboot.image.version }}"
       {{- with .Values.httpboot.resources }}
         resources:
 {{ toYaml . | indent 10 }}
       {{- end }}
         ports:
-        - containerPort: 80
+        - name: {{ include "openstackIronicStandalone.httpboot.fullname" . }}
+          containerPort: {{ .Values.httpboot.portInternal }}
         volumeMounts:
         - mountPath: /etc/nginx/nginx.conf
           name: nginx-conf
@@ -80,7 +81,7 @@ spec:
       volumes:
       - name: nginx-conf
         configMap:
-          name: {{ template "openstackIronicStandalone.httpboot.fullname" . }}
+          name: {{ include "openstackIronicStandalone.httpboot.fullname" . }}
           defaultMode: 0644
       - name: ironic
         persistentVolumeClaim:

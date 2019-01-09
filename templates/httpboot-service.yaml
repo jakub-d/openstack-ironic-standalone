@@ -1,24 +1,24 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: {{ include "openstackIronicStandalone.httpboot.fullname" . }}
   labels:
-    app: {{ template "openstackIronicStandalone.name" .  }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    component: "{{ .Values.httpboot.name }}"
+    app: {{ include "openstackIronicStandalone.name" . }}
+    chart: {{ include "openstackIronicStandalone.chart" . }}
+    component: {{ .Values.httpboot.name }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
-  name: {{ template "openstackIronicStandalone.httpboot.fullname" . }}
 spec:
   selector:
-    app: {{ template "openstackIronicStandalone.name" . }}
-    component: "{{ .Values.httpboot.name }}"
+    app: {{ include "openstackIronicStandalone.name" . }}
+    component: {{ .Values.httpboot.name }}
     release: {{ .Release.Name }}
   ports:
-  - name: http
-    port: 80
-    targetPort: 80
+  - name: {{ include "openstackIronicStandalone.httpboot.fullname" . }}
+    port: {{ .Values.httpboot.portExternal }}
+    targetPort: {{ .Values.httpboot.portInternal }}
     protocol: TCP
+  {{- with .Values.api.externalIPs }}
   externalIPs:
-    {{- range .Values.httpboot.externalIPs }}
-    - {{ . }}
-    {{- end }}
+{{ toYaml . | indent 4 }}
+  {{- end }}

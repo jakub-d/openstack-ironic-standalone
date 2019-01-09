@@ -1,19 +1,22 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  name: {{ include "openstackIronicStandalone.name" . }}-db-scripts
   labels:
-    app: {{ template "openstackIronicStandalone.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app: {{ include "openstackIronicStandalone.name" . }}
+    chart: {{ include "openstackIronicStandalone.chart" . }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
-  name: {{ template "openstackIronicStandalone.name" . }}-db-scripts
 data:
   wait-for-mysql.sh: |
+    <%!
+        import os
+    %>
     #!/bin/bash
     
     DB="{{ .Release.Name }}-mysql"
-    USER="{{.Values.mysql.mysqlUser}}"
-    PASS="{{.Values.mysql.mysqlPassword}}"
+    USER="{{ default "root" .Values.mysql.mysqlUser }}"
+    PASS="${os.environ.get('MYSQL_PASSWORD','')}"
     
     while ! mysql -u "${USER}" --password="${PASS}" -h "${DB}" -e 'show databases;' >/dev/null 2>&1
     do

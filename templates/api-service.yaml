@@ -1,23 +1,24 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: {{ include "openstackIronicStandalone.api.fullname" . }}
   labels:
-    app: {{ template "openstackIronicStandalone.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    component: "{{ .Values.api.name }}"
+    app: {{ include "openstackIronicStandalone.name" . }}
+    chart: {{ include "openstackIronicStandalone.chart" . }}
+    component: {{ .Values.api.name }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
-  name: {{ template "openstackIronicStandalone.api.fullname" . }}
 spec:
   selector:
-    app: {{ template "openstackIronicStandalone.name" . }}
-    component: "{{ .Values.api.name }}"
+    app: {{ include "openstackIronicStandalone.name" . }}
+    component: {{ .Values.api.name }}
     release: {{ .Release.Name }}
   ports:
-    - name: "ironic-api-port"
+    - name: {{ include "openstackIronicStandalone.api.fullname" . }}
       port: {{ .Values.api.portExternal }}
       targetPort: {{ .Values.api.portInternal }}
+  {{- with .Values.api.externalIPs }}
   externalIPs:
-    {{- range .Values.api.externalIPs }}
-    - {{ . }}
-    {{- end }}
+{{ toYaml . | indent 4 }}
+  {{- end }}
+
