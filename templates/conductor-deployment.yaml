@@ -21,7 +21,7 @@ spec:
         configmap-etc-hash: {{ include (print $.Template.BasePath "/etc-configmap.yaml") . | sha256sum }}
     spec:
       containers:
-        - name: {{ template "openstackIronicStandalone.name" . }}-{{ .Values.conductor.name }}
+        - name: {{ template "openstackIronicStandalone.conductor.fullname" . }}
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
           imagePullPolicy: "{{ .Values.image.pullPolicy }}"
         {{- with .Values.conductor.resources }}
@@ -84,4 +84,8 @@ spec:
             defaultMode: 0755
         - name: ironic
           persistentVolumeClaim:
-            claimName: "{{ .Values.persistentVolumeClaimName }}"
+            {{- if .Values.persistentVolumeClaimName }}
+            claimName: {{ .Values.persistentVolumeClaimName | quote }}
+            {{- else }}
+            claimName: {{ ( include "openstackIronicStandalone.tftp.fullname" . ) | quote }}
+            {{- end }}

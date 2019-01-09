@@ -7,8 +7,9 @@ image:
   version: rocky-0.0.7
   pullPolicy: IfNotPresent
 
-# Existing persistent volume claim
-persistentVolumeClaimName: DEFINE-EXISTING-PV-CLAIM
+## Existing persistent volume claim
+## make sure the pvc can be cross mounted between the containers
+# persistentVolumeClaimName: DEFINE-EXISTING-PV-CLAIM
 
 ## _Some_ of the /etc/ironic/ironic.conf
 ## configuration options.
@@ -131,11 +132,13 @@ tftp:
   externalIPs:
     - DEFINE-IP-HERE
 
-  ## TFTP image information
-  image:
-    name: jakubdlu/docker-ubuntu-atftpd
-    version: latest
-    pullPolicy: IfNotPresent
+  persistence:
+    enabled: true
+    accessMode: ReadWriteOnce
+    size: 8Gi
+    annotations: {}
+  ## make sure the resulted pvc can be cross mounted between the containers
+  #  storageClass: "default"
 
   ## Ironic tftp resources
   ##

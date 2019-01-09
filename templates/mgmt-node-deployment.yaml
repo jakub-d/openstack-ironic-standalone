@@ -55,7 +55,11 @@ spec:
       volumes:
         - name: ironic
           persistentVolumeClaim:
-            claimName: "{{ .Values.persistentVolumeClaimName }}"
+            {{- if .Values.persistentVolumeClaimName }}
+            claimName: {{ .Values.persistentVolumeClaimName | quote }}
+            {{- else }}
+            claimName: {{ ( include "openstackIronicStandalone.tftp.fullname" . ) | quote }}
+            {{- end }}
         - name: ironic-etc
           configMap:
             name: {{ template "openstackIronicStandalone.name" . }}-etc

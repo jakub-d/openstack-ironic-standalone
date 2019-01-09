@@ -1,0 +1,32 @@
+{{- range $index, $entry := tuple .Values.tftp.name }}
+{{- if and (index $.Values $entry).persistence.enabled (not $.Values.persistentVolumeClaimName) }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include (printf "openstackIronicStandalone.%v.fullname" $entry) $ }}
+
+{{- with (index $.Values $entry).persistence.annotations  }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  labels:
+    app: {{ include (printf "openstackIronicStandalone.%v.fullname" $entry) $ }}
+    chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
+    release: "{{ $.Release.Name }}"
+    heritage: "{{ $.Release.Service }}"
+spec:
+  accessModes:
+    - {{ (index $.Values $entry).persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ (index $.Values $entry).persistence.size | quote }}
+{{- if (index $.Values $entry).persistence.storageClass }}
+{{- if (eq "-" (index $.Values $entry).persistence.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ (index $.Values $entry).persistence.storageClass }}"
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

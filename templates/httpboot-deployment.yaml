@@ -58,7 +58,7 @@ spec:
               name: ironic
               subPath: tftpboot
       containers:
-      - name: {{ template "openstackIronicStandalone.fullname" . }}-{{ .Values.httpboot.name }}
+      - name: {{ template "openstackIronicStandalone.httpboot.fullname" . }}
         image:  "{{ .Values.httpboot.image.name }}:{{ .Values.httpboot.image.version }}"
       {{- with .Values.httpboot.resources }}
         resources:
@@ -88,4 +88,8 @@ spec:
           defaultMode: 0644
       - name: ironic
         persistentVolumeClaim:
-          claimName: "{{ .Values.persistentVolumeClaimName }}"
+          {{- if .Values.persistentVolumeClaimName }}
+          claimName: {{ .Values.persistentVolumeClaimName | quote }}
+          {{- else }}
+          claimName: {{ ( include "openstackIronicStandalone.tftp.fullname" . ) | quote }}
+          {{- end }}
