@@ -24,6 +24,7 @@ http {
                 root /var/www;
                 autoindex on;
                 server_name tarako;
+                dav_methods PUT;
                 location / {
                         try_files $uri $uri/ =404;
                 }

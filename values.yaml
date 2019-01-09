@@ -187,7 +187,7 @@ mysql:
   persistence:
     enabled: true
     subPath: mysql
-    existingClaim: DEFINE-EXISTING-PV-CLAIM
+  #  existingClaim: DEFINE-EXISTING-PV-CLAIM
   resources:
     requests:
       memory: 256Mi

@@ -58,9 +58,15 @@ Why minimalistic?
 Storage
 =======
 
-The chart uses an existing volume claim. It does not create any claims.
+The chart can use an existing volume claim. It will create a claim, if there is no claim name provided.
 It uses `subPath` functionality to create sub directories on the existing claim.
 The existing claim name must be defined in two places: `persistentVolumeClaimName` and `mysql.persistence.existingClaim`.
+
+One can upload disk images using HTTP PUT request:
+
+```
+curl -X PUT -H 'Content-Type: application/octet-stream' -d diskimage.qcow2 http://<httpboot_externalIP>
+```
 
 Note on tftpd
 =============

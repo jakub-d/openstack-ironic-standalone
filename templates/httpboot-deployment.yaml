@@ -23,12 +23,8 @@ spec:
       initContainers:
         - name: storage-dir-permissions
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
-          command: 
-            - chown
-            - "ironic:ironic"
-            - "/storage/httpboot"
-            - "/storage/tftpboot"
-            - "/storage/mgmt-scripts"
+          command: ["/bin/bash"]
+          args: ["-c", "chown ironic:ironic /storage/httpboot /storage/tftpboot /storage/mgmt-scripts; chmod 777 /storage/httpboot"]
           securityContext:
             runAsUser: 0
             fsGroup: 0
