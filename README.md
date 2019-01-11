@@ -32,6 +32,36 @@ rabbitmq:
   rabbitmq:
     password: secret3
 ```
+(you don't have to define secrets, but this step is required for production, as random-generated secrets will change each helm roll-over and will not match persistent storage db)
+
+Another example of the config file, using ingress and dynamic pv provisioners (make sure the tftp storageClass used allows cross-pod mounting):
+```
+---
+ironicServerName: ironic.example.io
+api:
+  ingress:
+    enabled: true
+    hosts:
+      - ironic.example.io
+httpboot:
+  ingress:
+    enabled: true
+    hosts:
+      - ironicwww.example.io
+tftp:
+  externalIPs:
+    - 10.10.10.10
+  nodeSelector:
+    hostname: 10.10.10.10.xip.io
+  persistence:
+    storageClass: sharefs
+mysql:
+  mysqlPassword: secret1
+  mysqlRootPassword: secret2
+rabbitmq:
+  rabbitmq:
+    password: secret3
+```
 
 Then install a chart using command:
 ```
@@ -65,7 +95,7 @@ The existing claim name must be defined in two places: `persistentVolumeClaimNam
 One can upload disk images using HTTP PUT request:
 
 ```
-curl -X PUT -H 'Content-Type: application/octet-stream' -d diskimage.qcow2 http://<httpboot_externalIP>
+curl -T diskimage.qcow2 http://<httpboot_externalIP>
 ```
 
 Note on tftpd

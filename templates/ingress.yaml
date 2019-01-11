@@ -1,7 +1,6 @@
 {{- range $index, $entry := tuple .Values.api.name .Values.httpboot.name }}
 {{- if (index $.Values $entry).ingress.enabled -}}
-{{- $fullName := include "test.fullname" . -}}
-{{- $ingressPath := .Values.ingress.path -}}
+{{- $ingressPath := (index $.Values $entry).ingress.path -}}
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -10,8 +9,8 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ include "openstackIronicStandalone.name" $ }}
     helm.sh/chart: {{ include "openstackIronicStandalone.chart" $ }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
 {{- with (index $.Values $entry).ingress.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
@@ -34,8 +33,8 @@ spec:
         paths:
           - path: {{ $ingressPath }}
             backend:
-              serviceName: {{ $fullName }}
-              servicePort: {{ include (printf "openstackIronicStandalone.%v.fullname" $entry) $ }}
+              serviceName: {{ include (printf "openstackIronicStandalone.%v.fullname" $entry) $ }}
+              servicePort: {{ (printf "ironic-%v\n" $entry) }}
   {{- end }}
 {{- end }}
 {{- end }}

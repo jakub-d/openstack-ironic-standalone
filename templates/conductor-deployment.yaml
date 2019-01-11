@@ -29,15 +29,38 @@ spec:
 {{ toYaml . | indent 12 }}
         {{- end }}
           command:
-            - /usr/bin/ironic-conductor
+            - /bin/sh
           args:
-            - --config-file
-            - /etc/ironic/ironic.conf
+            - -c
+            - mako-render /etc/ironic/ironic.conf.mako >/tmp/ironic.conf; /usr/bin/ironic-conductor --config-file /tmp/ironic.conf
           env:
             - name: IRONIC_URL
               value: "{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
             - name: OS_AUTH_TOKEN
               value: "fake-token"
+            {{- if .Values.rabbitmq.enabled }}
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-rabbitmq
+                  key: rabbitmq-password
+            - name: RABBITMQ_ERLANG_COOKIE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-rabbitmq
+                  key: rabbitmq-erlang-cookie
+            {{- end }}
+            {{- if .Values.mysql.enabled }}
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-mysql
+                  {{- if .Values.mysql.mysqlUser }}
+                  key: mysql-password
+                  {{- else }}
+                  key: mysql-root-password
+                  {{- end }}
+            {{- end }}
 #          livenessProbe:
 #            exec:
 #              command:
@@ -61,18 +84,16 @@ spec:
             - -c
             - mako-render /tmp/wait-for-mysql.sh.mako >/tmp/wait-for-mysql.sh; chmod +x /tmp/wait-for-mysql.sh; /tmp/wait-for-mysql.sh
           env:
-            - name: MYSQL_PASSWORD
             {{- if .Values.mysql.enabled }}
+            - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "openstackIronicStandalone.name" . }}-mysql
+                  name: {{ .Release.Name }}-mysql
                   {{- if .Values.mysql.mysqlUser }}
                   key: mysql-password
                   {{- else }}
                   key: mysql-root-password
                   {{- end }}
-            {{- else }}
-              value: {{ .values.mysql.mysqlPassword }}
             {{- end }}
           volumeMounts:
             - mountPath: /tmp/wait-for-mysql.sh.mako
@@ -81,11 +102,37 @@ spec:
               readOnly: true
         - name: update-database-schema
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
-          command: 
-            - ironic-dbsync
-            - --config-file
-            - /etc/ironic/ironic.conf
-            - upgrade
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - mako-render /etc/ironic/ironic.conf.mako >/tmp/ironic.conf; /usr/bin/ironic-dbsync --config-file /tmp/ironic.conf upgrade
+          env:
+            - name: API_PORT_INTERNAL
+              value: {{ .Values.api.portInternal | quote }}
+            {{- if .Values.rabbitmq.enabled }}
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-rabbitmq
+                  key: rabbitmq-password
+            - name: RABBITMQ_ERLANG_COOKIE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-rabbitmq
+                  key: rabbitmq-erlang-cookie
+            {{- end }}
+            {{- if .Values.mysql.enabled }}
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-mysql
+                  {{- if .Values.mysql.mysqlUser }}
+                  key: mysql-password
+                  {{- else }}
+                  key: mysql-root-password
+                  {{- end }}
+            {{- end }}
           volumeMounts:
             - mountPath: /etc/ironic
               name: ironic-etc

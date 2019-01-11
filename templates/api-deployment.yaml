@@ -41,24 +41,24 @@ spec:
             - mako-render /etc/ironic/ironic.conf.mako >/tmp/ironic.conf; /usr/bin/ironic-api --config-file /tmp/ironic.conf
           env:
             - name: API_PORT_INTERNAL
-              value: {{ .Values.api.portInternal }}
+              value: {{ .Values.api.portInternal | quote }}
             {{- if .Values.rabbitmq.enabled }}
             - name: RABBITMQ_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "openstackIronicStandalone.name" . }}-rabbitmq
+                  name: {{ .Release.Name }}-rabbitmq
                   key: rabbitmq-password
             - name: RABBITMQ_ERLANG_COOKIE
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "openstackIronicStandalone.name" . }}-rabbitmq
+                  name: {{ .Release.Name }}-rabbitmq
                   key: rabbitmq-erlang-cookie
             {{- end }}
             {{- if .Values.mysql.enabled }}
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "openstackIronicStandalone.name" . }}-mysql
+                  name: {{ .Release.Name }}-mysql
                   {{- if .Values.mysql.mysqlUser }}
                   key: mysql-password
                   {{- else }}
@@ -72,7 +72,7 @@ spec:
             initialDelaySeconds: 15
             timeoutSeconds: 5
           ports:
-            - name: {{ include "openstackIronicStandalone.api.fullname" . }}
+            - name: ironic-api
               containerPort: {{ .Values.api.portInternal }}
           volumeMounts:
             - mountPath: /etc/ironic

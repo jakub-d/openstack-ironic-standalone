@@ -14,7 +14,7 @@ spec:
     component: {{ .Values.api.name }}
     release: {{ .Release.Name }}
   ports:
-    - name: {{ include "openstackIronicStandalone.api.fullname" . }}
+    - name: ironic-api
       port: {{ .Values.api.portExternal }}
       targetPort: {{ .Values.api.portInternal }}
   {{- with .Values.api.externalIPs }}

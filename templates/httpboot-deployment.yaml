@@ -24,7 +24,7 @@ spec:
         - name: storage-dir-permissions
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
           command: ["/bin/bash"]
-          args: ["-c", "chown ironic:ironic /storage/httpboot /storage/tftpboot /storage/mgmt-scripts; chmod 777 /storage/httpboot"]
+          args: ["-c", "chown ironic:ironic /storage/httpboot /storage/tftpboot /storage/mgmt-scripts; chmod 777 /storage/*"]
           securityContext:
             runAsUser: 0
             fsGroup: 0
@@ -61,7 +61,7 @@ spec:
 {{ toYaml . | indent 10 }}
       {{- end }}
         ports:
-        - name: {{ include "openstackIronicStandalone.httpboot.fullname" . }}
+        - name: ironic-httpboot
           containerPort: {{ .Values.httpboot.portInternal }}
         volumeMounts:
         - mountPath: /etc/nginx/nginx.conf
@@ -71,7 +71,6 @@ spec:
         - mountPath: /var/www
           name: ironic
           subPath: httpboot
-          readOnly: true
         livenessProbe:
           httpGet:
             path: /

@@ -4,7 +4,7 @@ ironicServerName: DEFINE-SERVER-NAME.IO
 ##
 image:
   name: jakubdlu/centos-openstack-ironic
-  version: rocky-0.0.7
+  version: rocky-0.0.9
   pullPolicy: IfNotPresent
 
 ## Existing persistent volume claim
@@ -109,7 +109,8 @@ httpboot:
 
   ingress:
     enabled: false
-    annotations: {}
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
     #  kubernetes.io/ingress.class: nginx
     #  kubernetes.io/tls-acme: "true"
     paths: []
@@ -163,7 +164,7 @@ tftp:
 
   persistence:
     enabled: true
-    accessMode: ReadWriteOnce
+    accessMode: ReadWriteMany
     size: 8Gi
     annotations: {}
   ## make sure the resulted pvc can be cross mounted between the containers
@@ -205,9 +206,9 @@ mysql:
   image: mysql
   imageTag: "5.7.14"
   mysqlUser: ironic
-  mysqlPassword: DEFINE-THIS-SECRET
+#  mysqlPassword: DEFINE-THIS-SECRET
   mysqlDatabase: ironic
-  mysqlRootPassword: DEFINE-THIS-SECRET
+#  mysqlRootPassword: DEFINE-THIS-SECRET
   imagePullPolicy: IfNotPresent
   readinessProbe:
     initialDelaySeconds: 60
@@ -227,7 +228,7 @@ rabbitmq:
   replicas: 1
   rabbitmq:
     username: rabbitmq
-    password: DEFINE-THIS-SECRET
+#    password: DEFINE-THIS-SECRET
   image:
     pullPolicy: IfNotPresent
   persistence:

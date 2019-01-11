@@ -5,7 +5,7 @@
 [{{ $section }}]
 {{- if eq $section "DEFAULT" }}
 {{- if $.Values.rabbitmq.enabled }}
-transport_url = rabbit://{{ $.Values.rabbitmq.rabbitmq.username }}:${os.environ.get('RABBITMQ_PASSWORD','')}@{{ include "openstackIronicStandalone.name" $ }}-rabbitmq:{{ $.Values.rabbitmq.rabbitmq.nodePort }}
+transport_url = rabbit://{{ $.Values.rabbitmq.rabbitmq.username }}:${os.environ.get('RABBITMQ_PASSWORD','')}@{{ $.Release.Name }}-rabbitmq:{{ $.Values.rabbitmq.rabbitmq.nodePort }}
 {{- end }}
 {{- end }}
 {{- if eq $section "api" }}
@@ -20,7 +20,7 @@ api_url = http://{{ include "openstackIronicStandalone.api.fullname" $ }}:{{ $.V
 {{- end }}
 {{- if eq $section "database" }}
 {{- if $.Values.mysql.enabled }}
-connection = mysql+pymysql://{{ default "root" $.Values.mysql.mysqlUser }}:${os.environ.get('MYSQL_PASSWORD','')}@{{ include "openstackIronicStandalone.name" $ }}-mysql/{{ default "mysql" $.Values.mysql.mysqlDatabase }}?charset=utf8
+connection = mysql+pymysql://{{ default "root" $.Values.mysql.mysqlUser }}:${os.environ.get('MYSQL_PASSWORD','')}@{{ $.Release.Name }}-mysql/{{ default "mysql" $.Values.mysql.mysqlDatabase }}?charset=utf8
 {{- end }}
 {{- end }}
 {{- if eq $section "deploy" }}
