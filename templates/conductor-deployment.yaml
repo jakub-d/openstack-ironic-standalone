@@ -1,41 +1,66 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
+  name: {{ include "openstackIronicStandalone.conductor.fullname" . }}
   labels:
-    app: {{ template "openstackIronicStandalone.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app: {{ include "openstackIronicStandalone.name" . }}
+    chart: {{ include "openstackIronicStandalone.chart" . }}
     component: {{ .Values.conductor.name }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
-  name: {{ template "openstackIronicStandalone.conductor.fullname" . }}
 spec:
   replicas: {{ .Values.conductor.replicas }}
   template:
     metadata:
       labels:
-        app: {{ template "openstackIronicStandalone.name" . }}
-        component: "{{ .Values.conductor.name }}"
+        app: {{ include "openstackIronicStandalone.name" . }}
+        component: {{ .Values.conductor.name }}
         release: {{ .Release.Name }}
-      name: {{ template "openstackIronicStandalone.conductor.fullname" . }}
+      name: {{ include "openstackIronicStandalone.conductor.fullname" . }}
       annotations:
         configmap-etc-hash: {{ include (print $.Template.BasePath "/etc-configmap.yaml") . | sha256sum }}
     spec:
       containers:
-        - name: {{ template "openstackIronicStandalone.name" . }}-{{ .Values.conductor.name }}
+        - name: {{ include "openstackIronicStandalone.conductor.fullname" . }}
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
           imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        {{- with .Values.conductor.resources }}
           resources:
-{{ toYaml .Values.conductor.resources | indent 12 }}
+{{ toYaml . | indent 12 }}
+        {{- end }}
           command:
-            - /usr/bin/ironic-conductor
+            - /bin/sh
           args:
-            - --config-file
-            - /etc/ironic/ironic.conf
+            - -c
+            - mako-render /etc/ironic/ironic.conf.mako >/tmp/ironic.conf; /usr/bin/ironic-conductor --config-file /tmp/ironic.conf
           env:
             - name: IRONIC_URL
-              value: "http://{{ .Release.Name }}-ironic-api:{{ .Values.api.portExternal }}/"
+              value: "{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
             - name: OS_AUTH_TOKEN
               value: "fake-token"
+            {{- if .Values.rabbitmq.enabled }}
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-rabbitmq
+                  key: rabbitmq-password
+            - name: RABBITMQ_ERLANG_COOKIE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-rabbitmq
+                  key: rabbitmq-erlang-cookie
+            {{- end }}
+            {{- if .Values.mysql.enabled }}
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-mysql
+                  {{- if .Values.mysql.mysqlUser }}
+                  key: mysql-password
+                  {{- else }}
+                  key: mysql-root-password
+                  {{- end }}
+            {{- end }}
 #          livenessProbe:
 #            exec:
 #              command:
@@ -53,20 +78,61 @@ spec:
       initContainers:
         - name: wait-for-mysql
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
-          command: 
-            - /usr/local/bin/wait-for-mysql.sh
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - mako-render /tmp/wait-for-mysql.sh.mako >/tmp/wait-for-mysql.sh; chmod +x /tmp/wait-for-mysql.sh; /tmp/wait-for-mysql.sh
+          env:
+            {{- if .Values.mysql.enabled }}
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-mysql
+                  {{- if .Values.mysql.mysqlUser }}
+                  key: mysql-password
+                  {{- else }}
+                  key: mysql-root-password
+                  {{- end }}
+            {{- end }}
           volumeMounts:
-            - mountPath: /usr/local/bin/wait-for-mysql.sh
+            - mountPath: /tmp/wait-for-mysql.sh.mako
               name: ironic-db-scripts
               subPath: wait-for-mysql.sh
               readOnly: true
         - name: update-database-schema
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
-          command: 
-            - ironic-dbsync
-            - --config-file
-            - /etc/ironic/ironic.conf
-            - upgrade
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - mako-render /etc/ironic/ironic.conf.mako >/tmp/ironic.conf; /usr/bin/ironic-dbsync --config-file /tmp/ironic.conf upgrade
+          env:
+            - name: API_PORT_INTERNAL
+              value: {{ .Values.api.portInternal | quote }}
+            {{- if .Values.rabbitmq.enabled }}
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-rabbitmq
+                  key: rabbitmq-password
+            - name: RABBITMQ_ERLANG_COOKIE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-rabbitmq
+                  key: rabbitmq-erlang-cookie
+            {{- end }}
+            {{- if .Values.mysql.enabled }}
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-mysql
+                  {{- if .Values.mysql.mysqlUser }}
+                  key: mysql-password
+                  {{- else }}
+                  key: mysql-root-password
+                  {{- end }}
+            {{- end }}
           volumeMounts:
             - mountPath: /etc/ironic
               name: ironic-etc
@@ -74,12 +140,16 @@ spec:
       volumes:
         - name: ironic-etc
           configMap:
-            name: {{ template "openstackIronicStandalone.name" . }}-etc
+            name: {{ include "openstackIronicStandalone.name" . }}-etc
             defaultMode: 0644
         - name: ironic-db-scripts
           configMap:
-            name: {{ template "openstackIronicStandalone.name" . }}-db-scripts
+            name: {{ include "openstackIronicStandalone.name" . }}-db-scripts
             defaultMode: 0755
         - name: ironic
           persistentVolumeClaim:
-            claimName: "{{ .Values.persistentVolumeClaimName }}"
+            {{- if .Values.persistentVolumeClaimName }}
+            claimName: {{ .Values.persistentVolumeClaimName | quote }}
+            {{- else }}
+            claimName: {{ ( include "openstackIronicStandalone.tftp.fullname" . ) | quote }}
+            {{- end }}

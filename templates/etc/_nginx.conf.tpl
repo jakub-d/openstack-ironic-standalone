@@ -16,7 +16,7 @@ http {
         include /etc/nginx/mime.types;
         default_type application/octet-stream;
         access_log /dev/stdout;
-        error_log /dev/stdout info;
+        error_log /dev/stdout debug;
         gzip off;
 
         server {
@@ -24,8 +24,12 @@ http {
                 root /var/www;
                 autoindex on;
                 server_name tarako;
+                client_max_body_size 0;
+                client_body_temp_path /tmp;
                 location / {
-                        try_files $uri $uri/ =404;
+                        dav_methods PUT DELETE MKCOL COPY MOVE;
+                        create_full_put_path on;
+                        dav_access user:rw group:rw all:rw;
                 }
         }
 }

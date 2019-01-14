@@ -1,27 +1,27 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
+  name: {{ include "openstackIronicStandalone.mgmt.fullname" . }}
   labels:
-    app: {{ template "openstackIronicStandalone.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app: {{ include "openstackIronicStandalone.name" . }}
+    chart: {{ include "openstackIronicStandalone.chart" . }}
     component: {{ .Values.mgmt.name }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
-  name: {{ template "openstackIronicStandalone.mgmt.fullname" . }}
 spec:
   replicas: {{ .Values.api.replicas }}
   template:
     metadata:
       labels:
-        app: {{ template "openstackIronicStandalone.name" . }}
+        app: {{ include "openstackIronicStandalone.name" . }}
         component: {{ .Values.mgmt.name }}
         release: {{ .Release.Name }}
-      name: {{ template "openstackIronicStandalone.mgmt.fullname" . }}
+      name: {{ include "openstackIronicStandalone.mgmt.fullname" . }}
       annotations:
         configmap-etc-hash: {{ include (print $.Template.BasePath "/etc-configmap.yaml") . | sha256sum }}
     spec:
       containers:
-        - name: {{ template "openstackIronicStandalone.mgmt.fullname" . }}
+        - name: {{ include "openstackIronicStandalone.mgmt.fullname" . }}
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
           imagePullPolicy: "{{ .Values.image.pullPolicy }}"
           command: [ "/usr/bin/sleep" ]
@@ -32,9 +32,17 @@ spec:
           - name: IRONIC_API_VERSION
             value: latest
           - name: IRONIC_URL
-            value: "http://{{ template "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
+            {{- if .Values.api.ingress.enabled }}
+            value: "http://{{ .Values.api.ingress.hosts | first }}/"
+            {{- else }}
+            value: "http://{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
+            {{- end }}
           - name: OS_URL
-            value: "http://{{ template "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
+            {{- if .Values.api.ingress.enabled }}
+            value: "http://{{ .Values.api.ingress.hosts | first }}/"
+            {{- else }}
+            value: "http://{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
+            {{- end }}
           - name: OS_TOKEN
             value: "fake-token"
           - name: OS_AUTH_TOKEN
@@ -55,11 +63,15 @@ spec:
       volumes:
         - name: ironic
           persistentVolumeClaim:
-            claimName: "{{ .Values.persistentVolumeClaimName }}"
+            {{- if .Values.persistentVolumeClaimName }}
+            claimName: {{ .Values.persistentVolumeClaimName | quote }}
+            {{- else }}
+            claimName: {{ ( include "openstackIronicStandalone.tftp.fullname" . ) | quote }}
+            {{- end }}
         - name: ironic-etc
           configMap:
-            name: {{ template "openstackIronicStandalone.name" . }}-etc
+            name: {{ include "openstackIronicStandalone.name" . }}-etc
         - name: ironic-db-scripts
           configMap:
-            name: {{ template "openstackIronicStandalone.name" . }}-db-scripts
+            name: {{ include "openstackIronicStandalone.name" . }}-db-scripts
             defaultMode: 0755

@@ -1,32 +1,36 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
+  name: {{ include "openstackIronicStandalone.tftp.fullname" . }}
   labels:
-    app: {{ template "openstackIronicStandalone.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app: {{ include "openstackIronicStandalone.name" . }}
+    chart: {{ include "openstackIronicStandalone.chart" . }}
     component: {{ .Values.tftp.name }}
     release: {{ .Release.Name }}
-  name: {{ template "openstackIronicStandalone.tftp.fullname" . }}
 spec:
   selector:
     matchLabels:
-      app: {{ template "openstackIronicStandalone.name" . }}
-      component: "{{ .Values.tftp.name }}"
+      app: {{ include "openstackIronicStandalone.name" . }}
+      component: {{ .Values.tftp.name }}
       release: {{ .Release.Name }}
   template:
     metadata:
+      name: {{ include "openstackIronicStandalone.tftp.fullname" . }}
       labels:
-        app: {{ template "openstackIronicStandalone.name" . }}
-        component: "{{ .Values.tftp.name }}"
+        app: {{ include "openstackIronicStandalone.name" . }}
+        component: {{ .Values.tftp.name }}
         release: {{ .Release.Name }}
-      name: {{ template "openstackIronicStandalone.tftp.fullname" . }}
     spec:
       securityContext:
         runAsUser: 0
         fsGroup: 0
       hostNetwork: true
+    {{- with .Values.tftp.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       containers:
-        - name: {{ template "openstackIronicStandalone.fullname" . }}-{{ .Values.tftp.name }}
+        - name: {{ include "openstackIronicStandalone.tftp.fullname" . }}
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
           imagePullPolicy: "{{ .Values.image.pullPolicy }}"
           tty: true
@@ -49,15 +53,21 @@ spec:
             - mountPath: /dev/log
               name: devlog
               readOnly: false
+        {{- with .Values.tftp.resources }}
           resources:
-{{ toYaml .Values.tftp.resources | indent 12 }}
+{{ toYaml . | indent 12 }}
+        {{- end }}
       volumes:
         - name: ironic
           persistentVolumeClaim:
-            claimName: "{{ .Values.persistentVolumeClaimName }}"
+            {{- if .Values.persistentVolumeClaimName }}
+            claimName: {{ .Values.persistentVolumeClaimName | quote }}
+            {{- else }}
+            claimName: {{ ( include "openstackIronicStandalone.tftp.fullname" . ) | quote }}
+            {{- end }}
         - name: ironic-etc
           configMap:
-            name: {{ template "openstackIronicStandalone.name" . }}-etc
+            name: {{ include "openstackIronicStandalone.name" . }}-etc
             defaultMode: 0644
         - name: devlog
           hostPath:

@@ -1,42 +1,70 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
+  name: {{ include "openstackIronicStandalone.api.fullname" . }}
   labels:
-    app: {{ template "openstackIronicStandalone.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app: {{ include "openstackIronicStandalone.name" . }}
+    chart: {{ include "openstackIronicStandalone.chart" . }}
     component: {{ .Values.api.name }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
-  name: {{ template "openstackIronicStandalone.api.fullname" . }}
 spec:
   replicas: {{ .Values.api.replicas }}
   template:
     metadata:
+      name: {{ include "openstackIronicStandalone.api.fullname" . }}
       labels:
-        app: {{ template "openstackIronicStandalone.name" . }}
-        component: "{{ .Values.api.name }}"
+        app: {{ include "openstackIronicStandalone.name" . }}
+        component: {{ .Values.api.name }}
         release: {{ .Release.Name }}
-      name: {{ template "openstackIronicStandalone.api.fullname" . }}
       annotations:
         configmap-etc-hash: {{ include (print $.Template.BasePath "/etc-configmap.yaml") . | sha256sum }}
     spec:
       template:
         metadata:
           labels:
-            app: {{ template "openstackIronicStandalone.name" . }}
-            component: "{{ .Values.api.name }}"
+            app: {{ include "openstackIronicStandalone.name" . }}
+            component: {{ .Values.api.name }}
             release: {{ .Release.Name }}
       containers:
-        - name: {{ template "openstackIronicStandalone.name" . }}-{{ .Values.api.name }}
+        - name: {{ include "openstackIronicStandalone.api.fullname" . }}
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
           imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        {{- with .Values.api.resources }}
           resources:
-{{ toYaml .Values.api.resources | indent 12 }}
+{{ toYaml . | indent 12 }}
+        {{- end }}
           command:
-            - /usr/bin/ironic-api
+            - /bin/sh
           args:
-            - --config-file
-            - /etc/ironic/ironic.conf
+            - -c
+            - mako-render /etc/ironic/ironic.conf.mako >/tmp/ironic.conf; /usr/bin/ironic-api --config-file /tmp/ironic.conf
+          env:
+            - name: API_PORT_INTERNAL
+              value: {{ .Values.api.portInternal | quote }}
+            {{- if .Values.rabbitmq.enabled }}
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-rabbitmq
+                  key: rabbitmq-password
+            - name: RABBITMQ_ERLANG_COOKIE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-rabbitmq
+                  key: rabbitmq-erlang-cookie
+            {{- end }}
+            {{- if .Values.mysql.enabled }}
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-mysql
+                  {{- if .Values.mysql.mysqlUser }}
+                  key: mysql-password
+                  {{- else }}
+                  key: mysql-root-password
+                  {{- end }}
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /
@@ -44,7 +72,7 @@ spec:
             initialDelaySeconds: 15
             timeoutSeconds: 5
           ports:
-            - name: "ironic-api-port"
+            - name: ironic-api
               containerPort: {{ .Values.api.portInternal }}
           volumeMounts:
             - mountPath: /etc/ironic
@@ -53,5 +81,5 @@ spec:
       volumes:
         - name: ironic-etc
           configMap:
-            name: {{ template "openstackIronicStandalone.name" . }}-etc
+            name: {{ include "openstackIronicStandalone.name" . }}-etc
             defaultMode: 0644
