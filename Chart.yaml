@@ -1,7 +1,7 @@
 name: openstack-ironic-standalone
-version: 0.1.7
+version: 0.2.0
 appVersion: rocky
-description: A Helm chart for Kubernetes
+description: Openstack Ironic chart for Kubernetes
 home: https://docs.openstack.org/ironic/latest/
 engine: gotpl
 tillerVersion: ">=2.8.0"
