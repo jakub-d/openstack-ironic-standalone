@@ -35,13 +35,10 @@ spec:
           imagePullPolicy: "{{ .Values.image.pullPolicy }}"
           tty: true
           command: 
-          - /usr/sbin/in.tftpd
-          - --ipv4
-          - -v
-          - --foreground
-          - --map-file
-          - /etc/tftp-map-file
-          - /tftpboot
+            - /bin/sh
+          args:
+            - -c
+            - rsyslogd -n & /usr/sbin/in.tftpd --ipv4 -v --foreground --map-file /etc/tftp-map-file /tftpboot
           volumeMounts:
             - mountPath: /tftpboot
               name: ironic
@@ -50,9 +47,6 @@ spec:
               name: ironic-etc
               subPath: tftp-map-file
               readOnly: true
-            - mountPath: /dev/log
-              name: devlog
-              readOnly: false
         {{- with .Values.tftp.resources }}
           resources:
 {{ toYaml . | indent 12 }}
@@ -69,6 +63,3 @@ spec:
           configMap:
             name: {{ include "openstackIronicStandalone.name" . }}-etc
             defaultMode: 0644
-        - name: devlog
-          hostPath:
-            path: /dev/log
