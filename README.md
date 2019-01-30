@@ -116,3 +116,6 @@ That's why we start in.tftpd DaemonSet with hostNetwork enabled.
 It means that we have a pool of servers running in.tftpd.
 Only the one that has the external IP address attached will be serving files.
 It does not use a Kubernetes network model (POD network, service network).
+
+The tftpd service can be exposed using keepalived floating IP, simple DNS
+round-robin record or simply by aiming directly at k8s node address.

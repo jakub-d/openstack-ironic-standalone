@@ -30,7 +30,7 @@ spec:
 {{ toYaml . | indent 8 }}
     {{- end }}
       containers:
-        - name: {{ include "openstackIronicStandalone.tftp.fullname" . }}
+        - name: tftpd
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
           imagePullPolicy: "{{ .Values.image.pullPolicy }}"
           tty: true
@@ -51,6 +51,23 @@ spec:
           resources:
 {{ toYaml . | indent 12 }}
         {{- end }}
+        - name: httpd
+          image:  "{{ .Values.httpboot.image.name }}:{{ .Values.httpboot.image.version }}"
+          volumeMounts:
+            - mountPath: /etc/nginx/nginx.conf
+              name: ironic-etc
+              subPath: httpd.conf
+              readOnly: true
+            - mountPath: /usr/share/nginx/html
+              name: ironic
+              {{- if .Values.config.pxe.ipxe_enabled }}
+              subPath: httpboot
+              {{- else }}
+              subPath: tftpboot
+              {{- end }}
+            - mountPath: /usr/share/nginx/html/boot.ipxe
+              name: ironic-etc
+              subPath: boot.ipxe
       volumes:
         - name: ironic
           persistentVolumeClaim:
