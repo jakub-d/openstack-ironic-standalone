@@ -4,7 +4,7 @@ ironicServerName: DEFINE-SERVER-NAME.IO
 ##
 image:
   name: jakubdlu/centos-openstack-ironic
-  version: rocky-0.0.9
+  version: rocky-0.0.12
   pullPolicy: IfNotPresent
 
 ## Existing persistent volume claim
@@ -46,7 +46,7 @@ config:
     tftp_master_path: /storage/tftpboot/master-path
     pxe_append_params: "console=tty0 console=ttyS0,115200 coreos.autologin=tty0"
     ipxe_boot_script: $pybasedir/drivers/modules/boot.ipxe
-    ## to enable ipxe, replace values of both following keys
+    ## to enable/disable ipxe, replace values of both following keys
     ipxe_enabled: false
     pxe_config_template: $pybasedir/drivers/modules/pxe_config.template
     # ipxe_enabled: true
@@ -229,6 +229,7 @@ rabbitmq:
   rabbitmq:
     username: rabbitmq
 #    password: DEFINE-THIS-SECRET
+#    erlangCookie: DEFINE-THIS-SECRET
   image:
     pullPolicy: IfNotPresent
   persistence:

@@ -32,17 +32,9 @@ spec:
           - name: IRONIC_API_VERSION
             value: latest
           - name: IRONIC_URL
-            {{- if .Values.api.ingress.enabled }}
-            value: "http://{{ .Values.api.ingress.hosts | first }}/"
-            {{- else }}
             value: "http://{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
-            {{- end }}
           - name: OS_URL
-            {{- if .Values.api.ingress.enabled }}
-            value: "http://{{ .Values.api.ingress.hosts | first }}/"
-            {{- else }}
             value: "http://{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
-            {{- end }}
           - name: OS_TOKEN
             value: "fake-token"
           - name: OS_AUTH_TOKEN

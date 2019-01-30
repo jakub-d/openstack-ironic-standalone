@@ -30,18 +30,15 @@ spec:
 {{ toYaml . | indent 8 }}
     {{- end }}
       containers:
-        - name: {{ include "openstackIronicStandalone.tftp.fullname" . }}
+        - name: tftpd
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
           imagePullPolicy: "{{ .Values.image.pullPolicy }}"
           tty: true
           command: 
-          - /usr/sbin/in.tftpd
-          - --ipv4
-          - -v
-          - --foreground
-          - --map-file
-          - /etc/tftp-map-file
-          - /tftpboot
+            - /bin/sh
+          args:
+            - -c
+            - rsyslogd -n & /usr/sbin/in.tftpd --ipv4 -v --foreground --map-file /etc/tftp-map-file /tftpboot
           volumeMounts:
             - mountPath: /tftpboot
               name: ironic
@@ -50,13 +47,27 @@ spec:
               name: ironic-etc
               subPath: tftp-map-file
               readOnly: true
-            - mountPath: /dev/log
-              name: devlog
-              readOnly: false
         {{- with .Values.tftp.resources }}
           resources:
 {{ toYaml . | indent 12 }}
         {{- end }}
+        - name: httpd
+          image:  "{{ .Values.httpboot.image.name }}:{{ .Values.httpboot.image.version }}"
+          volumeMounts:
+            - mountPath: /etc/nginx/nginx.conf
+              name: ironic-etc
+              subPath: httpd.conf
+              readOnly: true
+            - mountPath: /usr/share/nginx/html
+              name: ironic
+              {{- if .Values.config.pxe.ipxe_enabled }}
+              subPath: httpboot
+              {{- else }}
+              subPath: tftpboot
+              {{- end }}
+            - mountPath: /usr/share/nginx/html/boot.ipxe
+              name: ironic-etc
+              subPath: boot.ipxe
       volumes:
         - name: ironic
           persistentVolumeClaim:
@@ -69,6 +80,3 @@ spec:
           configMap:
             name: {{ include "openstackIronicStandalone.name" . }}-etc
             defaultMode: 0644
-        - name: devlog
-          hostPath:
-            path: /dev/log

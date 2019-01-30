@@ -15,7 +15,7 @@ port = {{ $.Values.api.portInternal }}
 {{- if $.Values.api.ingress.enabled }}
 api_url = http://{{ $.Values.api.ingress.hosts | first }}/
 {{- else }}
-api_url = http://{{ include "openstackIronicStandalone.api.fullname" $ }}:{{ $.Values.api.portExternal }}/
+api_url = http://{{ $.Values.api.externalIPs | first }}:{{ $.Values.api.portExternal }}/
 {{- end }}
 {{- end }}
 {{- if eq $section "database" }}
@@ -27,7 +27,7 @@ connection = mysql+pymysql://{{ default "root" $.Values.mysql.mysqlUser }}:${os.
 {{- if $.Values.httpboot.ingress.enabled }}
 http_url = http://{{ $.Values.httpboot.ingress.hosts | first }}/
 {{- else }}
-http_url = http://{{ include "openstackIronicStandalone.httpboot.fullname" $ }}/
+http_url = http://{{ $.Values.httpboot.externalIPs | first }}/
 {{- end }}
 {{- end }}
 {{- if eq $section "pxe" }}
