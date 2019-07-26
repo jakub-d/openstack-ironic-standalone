@@ -27,11 +27,11 @@ spec:
           command: [ "{{ .Values.mgmt.pod_command }}" ]
           args: [ "{{ .Values.mgmt.pod_args }}" ]
           env:
-{{ toYaml .Values.mgmt.env | indent 14 }}
-          - name: IRONIC_URL
-            value: "http://{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
-          - name: OS_URL
-            value: "http://{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
+{{ toYaml .Values.mgmt.env | indent 12 }}
+            - name: IRONIC_URL
+              value: "http://{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
+            - name: OS_URL
+              value: "http://{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
           volumeMounts:
             - mountPath: /usr/local/bin/wait-for-mysql.sh
               name: ironic-db-scripts
