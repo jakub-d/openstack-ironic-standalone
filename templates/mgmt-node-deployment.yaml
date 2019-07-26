@@ -24,21 +24,14 @@ spec:
         - name: {{ include "openstackIronicStandalone.mgmt.fullname" . }}
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
           imagePullPolicy: "{{ .Values.image.pullPolicy }}"
-          command: [ "/usr/bin/sleep" ]
-          args: [ "infinity" ]
+          command: [ "{{ .Values.mgmt.pod_command }}" ]
+          args: [ "{{ .Values.mgmt.pod_args }}" ]
           env:
-          - name: HISTFILE
-            value: /mnt/mgmt-scripts/.bash_history
-          - name: IRONIC_API_VERSION
-            value: latest
+{{ toYaml .Values.mgmt.env | indent 12 }}
           - name: IRONIC_URL
             value: "http://{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
           - name: OS_URL
             value: "http://{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
-          - name: OS_TOKEN
-            value: "fake-token"
-          - name: OS_AUTH_TOKEN
-            value: "fake-token"
           volumeMounts:
             - mountPath: /usr/local/bin/wait-for-mysql.sh
               name: ironic-db-scripts
