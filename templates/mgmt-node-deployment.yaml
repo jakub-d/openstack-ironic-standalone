@@ -27,7 +27,7 @@ spec:
           command: [ "{{ .Values.mgmt.pod_command }}" ]
           args: [ "{{ .Values.mgmt.pod_args }}" ]
           env:
-{{ toYaml .Values.mgmt.env | indent 12 }}
+{{ toYaml .Values.mgmt.env | indent 10 }}
           - name: IRONIC_URL
             value: "http://{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
           - name: OS_URL
