@@ -159,15 +159,9 @@ mgmt:
 
   ## POD Environment variables
   ##
-  env:
-  - name: OS_TOKEN
-    value: "fake-token"
-  - name: OS_AUTH_TOKEN
-    value: "fake-token"
+  extra_env:
   - name: HISTFILE
     value: /mnt/mgmt-scripts/.bash_history
-  - name: IRONIC_API_VERSION
-    value: latest
 
 tftp:
   ## Ironic tftp name

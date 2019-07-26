@@ -1,5 +1,5 @@
 name: openstack-ironic-standalone
-version: 0.3.3
+version: 0.3.4
 appVersion: rocky
 description: Openstack Ironic chart for Kubernetes
 home: https://docs.openstack.org/ironic/latest/
