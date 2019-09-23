@@ -1,3 +1,4 @@
+{{- if .Values.tftp.enabled -}}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -80,3 +81,4 @@ spec:
           configMap:
             name: {{ include "openstackIronicStandalone.name" . }}-etc
             defaultMode: 0644
+{{- end -}}

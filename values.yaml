@@ -164,6 +164,8 @@ mgmt:
     value: /mnt/mgmt-scripts/.bash_history
 
 tftp:
+  enabled: true
+
   ## Ironic tftp name
   ##
   name: tftp
