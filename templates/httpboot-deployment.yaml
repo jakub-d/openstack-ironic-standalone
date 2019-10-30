@@ -27,8 +27,7 @@ spec:
             - cp
             - "/usr/share/syslinux/pxelinux.0"
             - "/usr/share/ipxe/ipxe.efi"
-            - "/usr/share/syslinux/custom-ipxe.efi"
-            - "/usr/share/syslinux/custom-undionly.kpxe"
+            - "/usr/share/ipxe/undionly.kpxe"
             - "/tftpboot/"
           securityContext:
             runAsUser: 0
