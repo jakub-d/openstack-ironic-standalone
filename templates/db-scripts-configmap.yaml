@@ -8,17 +8,17 @@ metadata:
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
 data:
-  wait-for-mysql.sh: |
+  wait-for-mariadb.sh: |
     <%!
         import os
     %>
     #!/bin/bash
     
-    DB="{{ .Release.Name }}-mysql"
-    USER="{{ default "root" .Values.mysql.mysqlUser }}"
-    PASS="${os.environ.get('MYSQL_PASSWORD','')}"
+    DB="{{ .Release.Name }}-mariadb"
+    USER="{{ default "root" .Values.mariadb.db.user }}"
+    PASS="${os.environ.get('MARIADB_PASSWORD','')}"
     
-    while ! mysql -u "${USER}" --password="${PASS}" -h "${DB}" -e 'show databases;' >/dev/null 2>&1
+    while ! mariadb -u "${USER}" --password="${PASS}" -h "${DB}" -e 'show databases;' >/dev/null 2>&1
     do
       sleep 1
       echo -n "."

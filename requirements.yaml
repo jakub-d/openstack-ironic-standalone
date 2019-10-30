@@ -1,8 +1,8 @@
 dependencies:
-  - name: mysql
-    version: "0.19.x"
+  - name: mariadb
+    version: "6.12.2"
     repository: "https://kubernetes-charts.storage.googleapis.com"
-    condition: mysql.enabled
+    condition: mariadb.enabled
   - name: rabbitmq
     version: "2.2.x"
     repository: "https://kubernetes-charts.storage.googleapis.com"

@@ -41,9 +41,9 @@ spec:
 {{ toYaml .Values.mgmt.extra_env | indent 12 }}
 {{- end }}
           volumeMounts:
-            - mountPath: /usr/local/bin/wait-for-mysql.sh
+            - mountPath: /usr/local/bin/wait-for-mariadb.sh
               name: ironic-db-scripts
-              subPath: wait-for-mysql.sh
+              subPath: wait-for-mariadb.sh
               readOnly: true
             - mountPath: /storage
               name: ironic

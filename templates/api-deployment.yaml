@@ -54,15 +54,15 @@ spec:
                   name: {{ .Release.Name }}-rabbitmq
                   key: rabbitmq-erlang-cookie
             {{- end }}
-            {{- if .Values.mysql.enabled }}
-            - name: MYSQL_PASSWORD
+            {{- if .Values.mariadb.enabled }}
+            - name: MARIADB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-mysql
-                  {{- if .Values.mysql.mysqlUser }}
-                  key: mysql-password
+                  name: {{ .Release.Name }}-mariadb
+                  {{- if .Values.mariadb.db.user }}
+                  key: mariadb-password
                   {{- else }}
-                  key: mysql-root-password
+                  key: mariadb-root-password
                   {{- end }}
             {{- end }}
           livenessProbe:

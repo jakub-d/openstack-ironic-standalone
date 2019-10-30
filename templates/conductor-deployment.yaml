@@ -50,15 +50,15 @@ spec:
                   name: {{ .Release.Name }}-rabbitmq
                   key: rabbitmq-erlang-cookie
             {{- end }}
-            {{- if .Values.mysql.enabled }}
-            - name: MYSQL_PASSWORD
+            {{- if .Values.mariadb.enabled }}
+            - name: MARIADB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-mysql
-                  {{- if .Values.mysql.mysqlUser }}
-                  key: mysql-password
+                  name: {{ .Release.Name }}-mariadb
+                  {{- if .Values.mariadb.db.user }}
+                  key: mariadb-password
                   {{- else }}
-                  key: mysql-root-password
+                  key: mariadb-root-password
                   {{- end }}
             {{- end }}
 #          livenessProbe:
@@ -76,29 +76,29 @@ spec:
               name: ironic-etc
               readOnly: true
       initContainers:
-        - name: wait-for-mysql
+        - name: wait-for-mariadb
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
           command:
             - /bin/sh
           args:
             - -c
-            - mako-render /tmp/wait-for-mysql.sh.mako >/tmp/wait-for-mysql.sh; chmod +x /tmp/wait-for-mysql.sh; /tmp/wait-for-mysql.sh
+            - mako-render /tmp/wait-for-mariadb.sh.mako >/tmp/wait-for-mariadb.sh; chmod +x /tmp/wait-for-mariadb.sh; /tmp/wait-for-mariadb.sh
           env:
-            {{- if .Values.mysql.enabled }}
-            - name: MYSQL_PASSWORD
+            {{- if .Values.mariadb.enabled }}
+            - name: MARIADB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-mysql
-                  {{- if .Values.mysql.mysqlUser }}
-                  key: mysql-password
+                  name: {{ .Release.Name }}-mariadb
+                  {{- if .Values.mariadb.db.user }}
+                  key: mariadb-password
                   {{- else }}
-                  key: mysql-root-password
+                  key: mariadb-root-password
                   {{- end }}
             {{- end }}
           volumeMounts:
-            - mountPath: /tmp/wait-for-mysql.sh.mako
+            - mountPath: /tmp/wait-for-mariadb.sh.mako
               name: ironic-db-scripts
-              subPath: wait-for-mysql.sh
+              subPath: wait-for-mariadb.sh
               readOnly: true
         - name: update-database-schema
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
@@ -122,15 +122,15 @@ spec:
                   name: {{ .Release.Name }}-rabbitmq
                   key: rabbitmq-erlang-cookie
             {{- end }}
-            {{- if .Values.mysql.enabled }}
-            - name: MYSQL_PASSWORD
+            {{- if .Values.mariadb.enabled }}
+            - name: MARIADB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-mysql
-                  {{- if .Values.mysql.mysqlUser }}
-                  key: mysql-password
+                  name: {{ .Release.Name }}-mariadb
+                  {{- if .Values.mariadb.db.user }}
+                  key: mariadb-password
                   {{- else }}
-                  key: mysql-root-password
+                  key: mariadb-root-password
                   {{- end }}
             {{- end }}
           volumeMounts:
