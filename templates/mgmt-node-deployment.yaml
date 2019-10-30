@@ -27,10 +27,6 @@ spec:
           command: [ "{{ .Values.mgmt.pod_command }}" ]
           args: [ "{{ .Values.mgmt.pod_args }}" ]
           env:
-            - name: OS_TOKEN
-              value: "fake-token"
-            - name: OS_AUTH_TOKEN
-              value: "fake-token"
             - name: OS_AUTH_TYPE
               value: "none"
             - name: OS_ENDPOINT
