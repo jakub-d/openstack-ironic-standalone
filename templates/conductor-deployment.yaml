@@ -119,7 +119,7 @@ spec:
               subPath: mgmt-scripts
             - mountPath: /mnt/mariadb
               name: ironic
-              subPath: "{{ .Values.mariadb.master.subPath }}"
+              subPath: "{{ .Values.mariadb.master.persistence.subPath }}"
         - name: update-database-schema
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
           command:
