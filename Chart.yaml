@@ -1,6 +1,6 @@
 name: openstack-ironic-standalone
 version: 1.0.1-dev
-appVersion: rocky
+appVersion: train
 description: Openstack Ironic chart for Kubernetes
 home: https://docs.openstack.org/ironic/latest/
 engine: gotpl
