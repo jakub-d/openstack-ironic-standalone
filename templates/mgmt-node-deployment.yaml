@@ -31,6 +31,10 @@ spec:
               value: "fake-token"
             - name: OS_AUTH_TOKEN
               value: "fake-token"
+            - name: OS_AUTH_TYPE
+              value: "none"
+            - name: OS_ENDPOINT
+              value: "http://{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
             - name: IRONIC_API_VERSION
               value: latest
             - name: IRONIC_URL
