@@ -221,6 +221,8 @@ mariadb:
 #   password: DEFINE-THIS-SECRET
     name: ironic
 #  rootUser.password: DEFINE-THIS-SECRET
+  slave:
+    replicas: 0
   master:
     persistence:
       enabled: true
