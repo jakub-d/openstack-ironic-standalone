@@ -1,6 +1,12 @@
 Helm Chart - Openstack Ironic Standalone
 ========================================
 
+Breaking change in 2.0.0
+------------------------
+The chart switches from MySQL to Mariadb DB engine.
+Create a SQL dump on existing database before upgrade and load it to the newly created Mariadb.
+Note that configuration parameters for databases change.
+
 [![Build Status](https://travis-ci.org/jakub-d/openstack-ironic-standalone.svg?branch=master)](https://travis-ci.org/jakub-d/openstack-ironic-standalone)
 
 [Openstack Ironic](https://docs.openstack.org/ironic/latest/index.html), Ironic is an OpenStack project which provisions bare metal (as opposed to virtual) machines. It may be used independently or as part of an OpenStack Cloud, and integrates with the OpenStack Identity (keystone), Compute (nova), Network (neutron), Image (glance), and Object (swift) services.
@@ -23,11 +29,14 @@ httpboot:
 tftp:
   externalIPs:
     - 10.10.10.10
-mysql:
-  mysqlPassword: secret1
-  mysqlRootPassword: secret2
-  persistence:
-    existingClaim: existing-claim-name
+mariadb:
+  db:
+    password: secret1
+  rootUser:
+    password: secret1
+  master:
+    persistence:
+      existingClaim: existing-claim-name
 rabbitmq:
   rabbitmq:
     password: secret3

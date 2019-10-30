@@ -214,23 +214,48 @@ conductor:
       memory: "8G"
       cpu: "8"
 
-mysql:
+mariadb:
   enabled: true
-  image: mysql
-  imageTag: "5.7.14"
-  mysqlUser: ironic
-#  mysqlPassword: DEFINE-THIS-SECRET
-  mysqlDatabase: ironic
-#  mysqlRootPassword: DEFINE-THIS-SECRET
-  imagePullPolicy: IfNotPresent
-  readinessProbe:
-    initialDelaySeconds: 60
-  livenessProbe:
-    initialDelaySeconds: 120
-  persistence:
-    enabled: true
-    subPath: mysql
-  #  existingClaim: DEFINE-EXISTING-PV-CLAIM
+  db:
+    user: ironic
+#   password: DEFINE-THIS-SECRET
+    name: ironic
+#  rootUser.password: DEFINE-THIS-SECRET
+  slave:
+    replicas: 0
+  master:
+    persistence:
+      enabled: true
+      subPath: mariadb
+   #  existingClaim: DEFINE-EXISTING-PV-CLAIM
+    config: |-
+      [mysqld]
+      skip-name-resolve
+      explicit_defaults_for_timestamp
+      basedir=/opt/bitnami/mariadb
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      tmpdir=/opt/bitnami/mariadb/tmp
+      max_allowed_packet=16M
+      bind-address=0.0.0.0
+      pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+      log-error=/opt/bitnami/mariadb/logs/mysqld.log
+      character-set-server=UTF8
+      collation-server=utf8_general_ci
+      default-storage-engine = innodb
+      innodb_file_per_table = on
+      max_connections = 4096
+
+      [client]
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      default-character-set=UTF8
+
+      [manager]
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+
   resources:
     requests:
       memory: 256Mi
