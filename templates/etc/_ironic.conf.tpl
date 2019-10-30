@@ -20,7 +20,7 @@ api_url = http://{{ $.Values.api.externalIPs | first }}:{{ $.Values.api.portExte
 {{- end }}
 {{- if eq $section "database" }}
 {{- if $.Values.mariadb.enabled }}
-connection = mysql+pymysql://{{ default "root" $.Values.mariadb.db.user }}:${os.environ.get('MARIADB_PASSWORD','')}@{{ $.Release.Name }}-mariadb/{{ default "mariadb" $.Values.db.name }}?charset=utf8
+connection = mysql+pymysql://{{ default "root" $.Values.mariadb.db.user }}:${os.environ.get('MARIADB_PASSWORD','')}@{{ $.Release.Name }}-mariadb/{{ default "mariadb" $.Values.mariadb.db.name }}?charset=utf8
 {{- end }}
 {{- end }}
 {{- if eq $section "deploy" }}
