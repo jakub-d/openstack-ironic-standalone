@@ -27,8 +27,24 @@ spec:
           command: [ "{{ .Values.mgmt.pod_command }}" ]
           args: [ "{{ .Values.mgmt.pod_args }}" ]
           env:
+{{- if .Values.keystone.enabled }}
+            - name: OS_USERNAME
+              value: "{{ .Values.keystone.ironic_user }}"
+            - name: OS_PROJECT_NAME
+              value: "{{ .Values.keystone.ironic_project_name }}"
+            - name: OS_IDENTITY_API_VERSION
+              value: "3"
+            - name: OS_AUTH_URL
+              value: "http://{{.Values.ironicServerName}}:{{ .Values.keystone.portExternal }}/v3/"
+            - name: OS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-keystone
+                  key: ironic_password
+{{- else }}
             - name: OS_AUTH_TYPE
               value: "none"
+{{- end }}
             - name: OS_ENDPOINT
               value: "http://{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
             - name: IRONIC_API_VERSION
@@ -41,10 +57,6 @@ spec:
 {{ toYaml .Values.mgmt.extra_env | indent 12 }}
 {{- end }}
           volumeMounts:
-            - mountPath: /usr/local/bin/wait-for-mariadb.sh
-              name: ironic-db-scripts
-              subPath: wait-for-mariadb.sh
-              readOnly: true
             - mountPath: /storage
               name: ironic
             - mountPath: /mnt/mgmt-scripts
@@ -64,7 +76,3 @@ spec:
         - name: ironic-etc
           configMap:
             name: {{ include "openstackIronicStandalone.name" . }}-etc
-        - name: ironic-db-scripts
-          configMap:
-            name: {{ include "openstackIronicStandalone.name" . }}-db-scripts
-            defaultMode: 0755

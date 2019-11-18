@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openstackIronicStandalone.keystone.fullname" . }}
+  labels:
+    app: {{ include "openstackIronicStandalone.name" . }}
+    chart: {{ include "openstackIronicStandalone.chart" . }}
+    component: {{ .Values.keystone.name }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  selector:
+    app: {{ include "openstackIronicStandalone.name" . }}
+    component: {{ .Values.keystone.name }}
+    release: {{ .Release.Name }}
+  ports:
+    - name: keystone
+      port: {{ .Values.keystone.portExternal }}
+      targetPort: {{ .Values.keystone.portInternal }}
+  {{- with .Values.keystone.externalIPs }}
+  externalIPs:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+

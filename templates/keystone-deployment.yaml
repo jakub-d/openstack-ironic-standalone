@@ -1,0 +1,190 @@
+{{- if .Values.keystone.enabled -}}
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ include "openstackIronicStandalone.keystone.fullname" . }}
+  labels:
+    app: {{ include "openstackIronicStandalone.name" . }}
+    chart: {{ include "openstackIronicStandalone.chart" . }}
+    component: {{ .Values.keystone.name }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.keystone.replicas }}
+  template:
+    metadata:
+      name: {{ include "openstackIronicStandalone.keystone.fullname" . }}
+      labels:
+        app: {{ include "openstackIronicStandalone.name" . }}
+        component: {{ .Values.keystone.name }}
+        release: {{ .Release.Name }}
+      annotations:
+        configmap-etc-hash: {{ include (print $.Template.BasePath "/etc-configmap.yaml") . | sha256sum }}
+    spec:
+      template:
+        metadata:
+          labels:
+            app: {{ include "openstackIronicStandalone.name" . }}
+            component: {{ .Values.keystone.name }}
+            release: {{ .Release.Name }}
+      initContainers:
+        - name: wait-for-mariadb
+          image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - /tmp/wait-for-mariadb.sh
+          env:
+            - name: DB_NAME
+              value: "{{ .Release.Name }}-mariadb"
+            - name: DB_USER
+              value: "{{ default "root" .Values.mariadb.db.user }}"
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-mariadb
+                  key: mariadb-password
+          volumeMounts:
+            - mountPath: /tmp/wait-for-mariadb.sh
+              name: ironic-scripts
+              subPath: wait-for-mariadb.sh
+              readOnly: true
+        - name: initialize-keystone
+          image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
+          imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - mako-render /tmp/keystone.conf.mako >/etc/keystone/keystone.conf; /tmp/initialize-keystone.sh
+          env:
+            - name: OS_URL
+              value: "http://{{.Values.ironicServerName}}:{{ .Values.keystone.portExternal }}/v3/"
+            - name: KEYSTONE_REGION
+              value: "{{.Values.keystone.default_region }}"
+            - name: OS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-keystone
+                  key: admin_password
+            - name: DB_NAME
+              value: "{{ .Release.Name }}-mariadb"
+            - name: DB_ADMIN_USER
+              value: "root"
+            - name: DB_ADMIN_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-mariadb
+                  key: mariadb-root-password
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-mariadb
+                  key: mariadb-password
+            - name: OS_USERNAME
+              value: admin
+            - name: OS_PROJECT_NAME
+              value: admin
+            - name: OS_IDENTITY_API_VERSION
+              value: "3"
+          securityContext:
+            runAsUser: 0
+            fsGroup: 0
+          volumeMounts:
+            - mountPath: /tmp/keystone.conf.mako
+              name: ironic-etc
+              subPath: keystone.conf.mako
+              readOnly: true
+            - mountPath: /tmp/initialize-keystone.sh
+              name: ironic-scripts
+              subPath: initialize-keystone.sh 
+              readOnly: true
+            - mountPath: /etc/keystone/fernet-keys
+              name: ironic
+              subPath: keystone-fernet-keys
+            - mountPath: /etc/keystone/credential-keys
+              name: ironic
+              subPath: keystone-credential-keys
+      containers:
+        - name: {{ include "openstackIronicStandalone.keystone.fullname" . }}
+          image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
+          imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        {{- with .Values.keystone.resources }}
+          resources:
+{{ toYaml . | indent 12 }}
+        {{- end }}
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - mako-render /tmp/keystone.conf.mako >/etc/keystone/keystone.conf; chown -R keystone /etc/keystone; httpd -DFOREGROUND
+          env:
+            - name: API_PORT_INTERNAL
+              value: {{ .Values.keystone.portInternal | quote }}
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-mariadb
+                  key: mariadb-password
+            - name: OS_URL
+              value: "http://{{.Values.ironicServerName}}:{{ .Values.keystone.portExternal }}/v3/"
+            - name: OS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-keystone
+                  key: admin_password
+            - name: OS_USERNAME
+              value: admin
+            - name: OS_PROJECT_NAME
+              value: admin
+            - name: OS_IDENTITY_API_VERSION
+              value: "3"
+            - name: OS_AUTH_URL
+              value: "http://{{.Values.ironicServerName}}:{{ .Values.keystone.portExternal }}/v3/"
+            - name: OS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-keystone
+                  key: admin_password
+          volumeMounts:
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.keystone.portInternal }}
+            initialDelaySeconds: 1500
+            timeoutSeconds: 5
+          ports:
+            - name: ironic-keystone
+              containerPort: {{ .Values.keystone.portInternal }}
+          securityContext:
+            runAsUser: 0
+            fsGroup: 0
+          volumeMounts:
+            - mountPath: /tmp/keystone.conf.mako
+              name: ironic-etc
+              subPath: keystone.conf.mako
+              readOnly: true
+            - mountPath: /etc/httpd/conf.d/wsgi-keystone.conf
+              name: ironic-etc
+              subPath: wsgi-keystone.conf
+              readOnly: true
+            - mountPath: /etc/keystone/fernet-keys
+              name: ironic
+              subPath: keystone-fernet-keys
+            - mountPath: /etc/keystone/credential-keys
+              name: ironic
+              subPath: keystone-credential-keys
+      volumes:
+        - name: ironic-etc
+          configMap:
+            name: {{ include "openstackIronicStandalone.name" . }}-etc
+            defaultMode: 0644
+        - name: ironic
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistentVolumeClaimName | quote }}
+        - name: ironic-scripts
+          configMap:
+            name: {{ include "openstackIronicStandalone.name" . }}-scripts
+            defaultMode: 0755
+{{- end -}}

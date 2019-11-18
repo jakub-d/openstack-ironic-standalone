@@ -36,8 +36,6 @@ spec:
           env:
             - name: IRONIC_URL
               value: "{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}/"
-            - name: OS_AUTH_TOKEN
-              value: "fake-token"
             {{- if .Values.rabbitmq.enabled }}
             - name: RABBITMQ_PASSWORD
               valueFrom:
@@ -82,10 +80,14 @@ spec:
             - /bin/sh
           args:
             - -c
-            - mako-render /tmp/wait-for-mariadb.sh.mako >/tmp/wait-for-mariadb.sh; chmod +x /tmp/wait-for-mariadb.sh; /tmp/wait-for-mariadb.sh
+            - /tmp/wait-for-mariadb.sh
           env:
+            - name: DB_NAME
+              value: "{{ .Release.Name }}-mariadb"
+            - name: DB_USER
+              value: "{{ default "root" .Values.mariadb.db.user }}"
             {{- if .Values.mariadb.enabled }}
-            - name: MARIADB_PASSWORD
+            - name: DB_PASS
               valueFrom:
                 secretKeyRef:
                   name: {{ .Release.Name }}-mariadb
@@ -96,8 +98,8 @@ spec:
                   {{- end }}
             {{- end }}
           volumeMounts:
-            - mountPath: /tmp/wait-for-mariadb.sh.mako
-              name: ironic-db-scripts
+            - mountPath: /tmp/wait-for-mariadb.sh
+              name: ironic-scripts
               subPath: wait-for-mariadb.sh
               readOnly: true
         - name: storage-dir-permissions
@@ -162,9 +164,9 @@ spec:
           configMap:
             name: {{ include "openstackIronicStandalone.name" . }}-etc
             defaultMode: 0644
-        - name: ironic-db-scripts
+        - name: ironic-scripts
           configMap:
-            name: {{ include "openstackIronicStandalone.name" . }}-db-scripts
+            name: {{ include "openstackIronicStandalone.name" . }}-scripts
             defaultMode: 0755
         - name: ironic
           persistentVolumeClaim:

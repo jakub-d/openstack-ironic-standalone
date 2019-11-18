@@ -1,11 +1,14 @@
 Helm Chart - Openstack Ironic Standalone
 ========================================
 
-Breaking change in 2.0.0
+Breaking change in 1.0.0
 ------------------------
 The chart switches from MySQL to Mariadb DB engine.
 Create a SQL dump on existing database before upgrade and load it to the newly created Mariadb.
 Note that configuration parameters for databases change.
+
+Overview
+--------
 
 [![Build Status](https://travis-ci.org/jakub-d/openstack-ironic-standalone.svg?branch=master)](https://travis-ci.org/jakub-d/openstack-ironic-standalone)
 
@@ -78,6 +81,27 @@ helm repo add ironic https://ironic.storage.googleapis.com
 helm install ironic/openstack-ironic-standalone -f my-site.yaml
 ```
 
+Keystone Authentication (Optional)
+==================================
+
+This chart deploys only Openstack Ironic by default.
+You can enable Keystone service by providing extra configuration parameters in the deployment:
+
+```
+keystone:
+  enabled: true
+  admin_password: ADMIN-PASSWORD
+  ironic_user: ironic
+  ironic_password: IRONIC-USER-PASSWORD
+  ironic_project_name: service
+  ironic_service_name: ironic
+  externalIPs:
+    - 10.10.10.10
+```
+
+This configuration will enable Keystone authentication. With 2 pre-configured user accounts: `admin` and `ironic`.
+The `ironic` account can be used to perform baremetal operations.
+
 Configuration
 =============
 
@@ -128,3 +152,9 @@ It does not use a Kubernetes network model (POD network, service network).
 
 The tftpd service can be exposed using keepalived floating IP, simple DNS
 round-robin record or simply by aiming directly at k8s node address.
+
+Changelog
+=========
+1.1.0 - Add optional Keystone service
+1.0.0 - Migrate MySQL to Mariadb, enable Train release
+

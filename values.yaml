@@ -1,10 +1,10 @@
-ironicServerName: DEFINE-SERVER-NAME.IO
+ironicServerName: DEFINE-SERVER-NAME.IO-OR-EXTERNAL-IP
 
 ## Ironic container image used for all Ironic components
 ##
 image:
   name: jakubdlu/centos-openstack-ironic
-  version: rocky-0.0.12
+  version: train-0.2.0
   pullPolicy: IfNotPresent
 
 ## Existing persistent volume claim
@@ -19,8 +19,8 @@ config:
   DEFAULT:
     debug: false
     enabled_hardware_types: ipmi
-    auth_strategy: noauth
     enabled_network_interfaces: noop
+  keystone_authtoken: {}
   api:
     api_workers: 8
   conductor:
@@ -93,6 +93,49 @@ api:
     limits:
       memory: "8G"
       cpu: "8"
+
+keystone:
+  enabled: false
+  ## Keystone container name
+  ##
+  name: keystone
+
+  default_region: ironic
+
+  ## Keystone scaling settings
+  ##
+  replicas: 1
+
+  ## Ironic API ports
+  ##
+  portInternal: 5000
+  portExternal: 5000
+
+  ingress:
+    enabled: false
+    annotations: {}
+    #  kubernetes.io/ingress.class: nginx
+    #  kubernetes.io/tls-acme: "true"
+    paths: []
+    hosts:
+      - chart-example.local
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  # externalIPs:
+  #   - DEFINE-IP-HERE
+
+  ## Ironic API resources
+  ##
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "200m"
+    limits:
+      memory: "256Mi"
+      cpu: "1"
 
 
 httpboot:
