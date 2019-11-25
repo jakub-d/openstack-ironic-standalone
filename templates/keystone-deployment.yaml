@@ -1,5 +1,5 @@
 {{- if .Values.keystone.enabled -}}
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "openstackIronicStandalone.keystone.fullname" . }}
@@ -11,6 +11,11 @@ metadata:
     release: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.keystone.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "openstackIronicStandalone.name" . }}
+      component: {{ .Values.keystone.name }}
+      release: {{ .Release.Name }}
   template:
     metadata:
       name: {{ include "openstackIronicStandalone.keystone.fullname" . }}
