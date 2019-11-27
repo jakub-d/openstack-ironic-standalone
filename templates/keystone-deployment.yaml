@@ -65,7 +65,7 @@ spec:
             - mako-render /tmp/keystone.conf.mako >/etc/keystone/keystone.conf; /tmp/initialize-keystone.sh
           env:
             - name: OS_URL
-              value: "http://{{.Values.ironicServerName}}:{{ .Values.keystone.portExternal }}/v3/"
+              value: "http://{{include "openstackIronicStandalone.keystone.fullname" .}}:{{ .Values.keystone.portExternal }}/v3/"
             - name: KEYSTONE_REGION
               value: "{{.Values.keystone.default_region }}"
             - name: OS_PASSWORD
@@ -133,7 +133,7 @@ spec:
                   name: {{ .Release.Name }}-mariadb
                   key: mariadb-password
             - name: OS_URL
-              value: "http://{{.Values.ironicServerName}}:{{ .Values.keystone.portExternal }}/v3/"
+              value: "http://{{include "openstackIronicStandalone.keystone.fullname" .}}:{{ .Values.keystone.portExternal }}/v3/"
             - name: OS_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -146,7 +146,7 @@ spec:
             - name: OS_IDENTITY_API_VERSION
               value: "3"
             - name: OS_AUTH_URL
-              value: "http://{{.Values.ironicServerName}}:{{ .Values.keystone.portExternal }}/v3/"
+              value: "http://{{include "openstackIronicStandalone.keystone.fullname" .}}:{{ .Values.keystone.portExternal }}/v3/"
             - name: OS_PASSWORD
               valueFrom:
                 secretKeyRef:

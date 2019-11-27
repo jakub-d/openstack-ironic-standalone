@@ -1,6 +1,13 @@
 Helm Chart - Openstack Ironic Standalone
 ========================================
 
+Note on service_type=LoadBalancer support
+-----------------------------------------
+
+Tftp works only with service_type=ClusterIP with ExternalIPs managed by keepalived.
+If your k8s cluster uses metallb with layer2, tftp won't work.
+With metallb, best option is to host tftp service outside of the k8s cluster.
+
 Breaking change in 1.0.0
 ------------------------
 The chart switches from MySQL to Mariadb DB engine.

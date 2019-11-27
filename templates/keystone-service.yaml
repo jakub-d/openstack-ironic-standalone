@@ -13,10 +13,14 @@ spec:
     app: {{ include "openstackIronicStandalone.name" . }}
     component: {{ .Values.keystone.name }}
     release: {{ .Release.Name }}
+  type: {{ .Values.keystone.service_type }}
   ports:
     - name: keystone
       port: {{ .Values.keystone.portExternal }}
       targetPort: {{ .Values.keystone.portInternal }}
+  {{- if .Values.keystone.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.keystone.loadBalancerIP }}
+  {{- end }}
   {{- with .Values.keystone.externalIPs }}
   externalIPs:
 {{ toYaml . | indent 4 }}

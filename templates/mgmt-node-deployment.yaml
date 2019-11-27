@@ -40,7 +40,7 @@ spec:
             - name: OS_IDENTITY_API_VERSION
               value: "3"
             - name: OS_AUTH_URL
-              value: "http://{{.Values.ironicServerName}}:{{ .Values.keystone.portExternal }}/v3/"
+              value: "http://{{include "openstackIronicStandalone.keystone.fullname" .}}:{{ .Values.keystone.portExternal }}/v3/"
             - name: OS_PASSWORD
               valueFrom:
                 secretKeyRef:

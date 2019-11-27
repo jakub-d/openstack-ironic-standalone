@@ -32,8 +32,10 @@ user_domain_name = default
 {{- if eq $section "conductor" }}
 {{- if $.Values.api.ingress.enabled }}
 api_url = http://{{ $.Values.api.ingress.hosts | first }}/
-{{- else }}
+{{- else if $.Values.api.externalIPs }}
 api_url = http://{{ $.Values.api.externalIPs | first }}:{{ $.Values.api.portExternal }}/
+{{- else if $.Values.api.loadBalancerIP }}
+api_url = http://{{ $.Values.api.loadBalancerIP }}:{{ $.Values.api.portExternal }}/
 {{- end }}
 {{- end }}
 {{- if eq $section "database" }}
@@ -45,12 +47,18 @@ connection = mysql+pymysql://{{ default "root" $.Values.mariadb.db.user }}:${os.
 {{- if $.Values.httpboot.ingress.enabled }}
 http_url = http://{{ $.Values.httpboot.ingress.hosts | first }}/
 {{- else }}
+{{- if $.Values.httpboot.externalIPs }}
 http_url = http://{{ $.Values.httpboot.externalIPs | first }}/
+{{- else if $.Values.httpboot.loadBalancerIP }}
+http_url = http://{{ $.Values.httpboot.loadBalancerIP }}/
+{{- end }}
 {{- end }}
 {{- end }}
 {{- if eq $section "pxe" }}
-{{- if $.Values.tftp.externalIPs }}
-tftp_server = {{ $.Values.tftp.externalIPs | first }}
+{{- if $.Values.tftp.public_ip }}
+tftp_server = {{ $.Values.tftp.public_ip }}
+{{- else if $.Values.tftp.externalIPs }}
+tftp_server = {{ $.Values.tftp.externalIPs  | first }}
 {{- end }}
 {{- end }}
 {{- range $key, $val := $params }}

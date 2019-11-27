@@ -13,10 +13,14 @@ spec:
     app: {{ include "openstackIronicStandalone.name" . }}
     component: {{ .Values.api.name }}
     release: {{ .Release.Name }}
+  type: {{ .Values.api.service_type }}
   ports:
     - name: ironic-api
       port: {{ .Values.api.portExternal }}
       targetPort: {{ .Values.api.portInternal }}
+  {{- if .Values.api.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.api.loadBalancerIP }}
+  {{- end }}
   {{- with .Values.api.externalIPs }}
   externalIPs:
 {{ toYaml . | indent 4 }}

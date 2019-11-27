@@ -79,10 +79,15 @@ api:
     #    hosts:
     #      - chart-example.local
 
-  ## Ironic API external IP
-  ##
+  # K8S service types
+  # For service type ClusterIP define externalIPs
+  service_type: ClusterIP
   # externalIPs:
   #   - DEFINE-IP-HERE
+
+  # For service type LoadBalancer define loadBalancerIP
+  # service_type: LoadBalancer
+  # loadBalancerIP: DEFINE-IP-HERE
 
   ## Ironic API resources
   ##
@@ -124,8 +129,15 @@ keystone:
     #    hosts:
     #      - chart-example.local
 
+  # K8S service types
+  # For service type ClusterIP define externalIPs
+  service_type: ClusterIP
   # externalIPs:
   #   - DEFINE-IP-HERE
+
+  # For service type LoadBalancer define loadBalancerIP
+  # service_type: LoadBalancer
+  # loadBalancerIP: DEFINE-IP-HERE
 
   ## Ironic API resources
   ##
@@ -164,10 +176,16 @@ httpboot:
     #    hosts:
     #      - chart-example.local
 
-  ## Ironic www external IP
-  ##
+  # K8S service types
+  # For service type ClusterIP define externalIPs
+  service_type: ClusterIP
   # externalIPs:
   #   - DEFINE-IP-HERE
+
+  # For service type LoadBalancer define loadBalancerIP
+  # service_type: LoadBalancer
+  # loadBalancerIP: DEFINE-IP-HERE
+
 
   ## Ironic www container image info
   ##
@@ -215,8 +233,11 @@ tftp:
 
   ## Ironic tftp network configuration
   ##
-  externalIPs:
-    - DEFINE-IP-HERE
+  # Note that tftp traffic is not managed by k8s
+  # tfp daemons run on all worker node with hostNetwork=true
+  # You can select either an ip of one of your k8s worker nodes,
+  # or use a floating ip managed by metallb/keepalived
+  public_ip: DEFINE-IP-HERE
 
   persistence:
     enabled: true

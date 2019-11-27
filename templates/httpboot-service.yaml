@@ -13,11 +13,15 @@ spec:
     app: {{ include "openstackIronicStandalone.name" . }}
     component: {{ .Values.httpboot.name }}
     release: {{ .Release.Name }}
+  type: {{ .Values.httpboot.service_type }}
   ports:
   - name: ironic-httpboot
     port: {{ .Values.httpboot.portExternal }}
     targetPort: {{ .Values.httpboot.portInternal }}
     protocol: TCP
+  {{- if .Values.httpboot.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.httpboot.loadBalancerIP }}
+  {{- end }}
   {{- with .Values.api.externalIPs }}
   externalIPs:
 {{ toYaml . | indent 4 }}

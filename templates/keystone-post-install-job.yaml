@@ -34,7 +34,7 @@ spec:
             - /tmp/enable-ironic-in-keystone.sh
           env:
             - name: OS_AUTH_URL
-              value: "http://{{.Values.ironicServerName}}:{{ .Values.keystone.portExternal }}/v3/"
+              value: "http://{{include "openstackIronicStandalone.keystone.fullname" .}}:{{ .Values.keystone.portExternal }}/v3/"
             - name: KEYSTONE_REGION
               value: "{{.Values.keystone.default_region }}"
             - name: OS_PASSWORD
@@ -54,7 +54,7 @@ spec:
             - name: KEYSTONE_IRONIC_SERVICE
               value: "{{ .Values.keystone.ironic_service_name }}"
             - name: IRONIC_API_URL
-              value: "http://{{.Values.ironicServerName}}:{{ .Values.api.portExternal }}"
+              value: "http://{{include "openstackIronicStandalone.keystone.fullname" .}}:{{ .Values.api.portExternal }}"
             - name: OS_USERNAME
               value: admin
             - name: OS_PROJECT_NAME
