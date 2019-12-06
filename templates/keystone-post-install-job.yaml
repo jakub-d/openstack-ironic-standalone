@@ -54,7 +54,7 @@ spec:
             - name: KEYSTONE_IRONIC_SERVICE
               value: "{{ .Values.keystone.ironic_service_name }}"
             - name: IRONIC_API_URL
-              value: "http://{{include "openstackIronicStandalone.keystone.fullname" .}}:{{ .Values.api.portExternal }}"
+              value: "http://{{ include "openstackIronicStandalone.api.fullname" . }}:{{ .Values.api.portExternal }}"
             - name: OS_USERNAME
               value: admin
             - name: OS_PROJECT_NAME
