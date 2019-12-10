@@ -2,6 +2,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "openstackIronicStandalone.keystone.fullname" . }}
+  {{- with .Values.keystone.service_annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+  {{- end }}
   labels:
     app: {{ include "openstackIronicStandalone.name" . }}
     chart: {{ include "openstackIronicStandalone.chart" . }}

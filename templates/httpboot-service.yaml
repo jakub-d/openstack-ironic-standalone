@@ -2,6 +2,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "openstackIronicStandalone.httpboot.fullname" . }}
+  {{- with .Values.httpboot.service_annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+  {{- end }}
   labels:
     app: {{ include "openstackIronicStandalone.name" . }}
     chart: {{ include "openstackIronicStandalone.chart" . }}
@@ -22,7 +26,7 @@ spec:
   {{- if .Values.httpboot.loadBalancerIP }}
   loadBalancerIP: {{ .Values.httpboot.loadBalancerIP }}
   {{- end }}
-  {{- with .Values.api.externalIPs }}
+  {{- with .Values.httpboot.externalIPs }}
   externalIPs:
 {{ toYaml . | indent 4 }}
   {{- end }}

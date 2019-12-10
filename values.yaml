@@ -89,6 +89,10 @@ api:
   # service_type: LoadBalancer
   # loadBalancerIP: DEFINE-IP-HERE
 
+  # Optional service annotations
+  # service_annotations:
+  #   metallb.universe.tf/allow-shared-ip: sharing key
+
   ## Ironic API resources
   ##
   resources:
@@ -139,6 +143,10 @@ keystone:
   # service_type: LoadBalancer
   # loadBalancerIP: DEFINE-IP-HERE
 
+  # Optional service annotations
+  # service_annotations:
+  #   metallb.universe.tf/allow-shared-ip: sharing key
+
   ## Ironic API resources
   ##
   resources:
@@ -186,6 +194,9 @@ httpboot:
   # service_type: LoadBalancer
   # loadBalancerIP: DEFINE-IP-HERE
 
+  # Optional service annotations
+  # service_annotations:
+  #   metallb.universe.tf/allow-shared-ip: sharing key
 
   ## Ironic www container image info
   ##
