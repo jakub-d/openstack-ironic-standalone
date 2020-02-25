@@ -279,6 +279,11 @@ conductor:
   ##
   replicas: 1
 
+  ## Conductor can be run in privileged mode for iscsi deployment interface
+  ##
+  privileged: false
+  hostNetwork: false
+
   ## Ironic Conductor resources
   ##
   resources:
