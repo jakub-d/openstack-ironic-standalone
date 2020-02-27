@@ -83,6 +83,10 @@ spec:
             - mountPath: /etc/ironic
               name: ironic-etc
               readOnly: true
+            {{- if .Values.conductor.privileged }}
+            - mountPath: /dev
+              name: host-dev
+            {{- end }}
       initContainers:
         - name: wait-for-mariadb
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
@@ -185,3 +189,9 @@ spec:
             {{- else }}
             claimName: {{ ( include "openstackIronicStandalone.tftp.fullname" . ) | quote }}
             {{- end }}
+        {{- if .Values.conductor.privileged }}
+        - name: host-dev
+          hostPath:
+            path: /dev
+          type: Directory
+        {{- end }}
