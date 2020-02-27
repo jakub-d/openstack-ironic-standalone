@@ -27,6 +27,9 @@ spec:
     spec:
       privileged: {{ .Values.conductor.privileged }}
       hostNetwork: {{ .Values.conductor.hostNetwork }}
+      {{- if .Values.conductor.hostNetwork }}
+      dnsPolicy: ClusterFirstWithHostNet
+      {{- end }}
       containers:
         - name: {{ include "openstackIronicStandalone.conductor.fullname" . }}
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
