@@ -25,7 +25,6 @@ spec:
       annotations:
         configmap-etc-hash: {{ include (print $.Template.BasePath "/etc-configmap.yaml") . | sha256sum }}
     spec:
-      privileged: {{ .Values.conductor.privileged }}
       hostNetwork: {{ .Values.conductor.hostNetwork }}
       {{- if .Values.conductor.hostNetwork }}
       dnsPolicy: ClusterFirstWithHostNet
@@ -34,6 +33,8 @@ spec:
         - name: {{ include "openstackIronicStandalone.conductor.fullname" . }}
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
           imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+          securityContext:
+            privileged: {{ .Values.conductor.privileged }}
         {{- with .Values.conductor.resources }}
           resources:
 {{ toYaml . | indent 12 }}
@@ -194,4 +195,5 @@ spec:
           hostPath:
             path: /dev
           type: Directory
+          readOnly: false
         {{- end }}
