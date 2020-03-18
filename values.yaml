@@ -11,6 +11,10 @@ image:
 ## make sure the pvc can be cross mounted between the containers
 # persistentVolumeClaimName: DEFINE-EXISTING-PV-CLAIM
 
+## /etc/ironic/policy.json contents
+##
+policy_json: ""
+
 ## _Some_ of the /etc/ironic/ironic.conf
 ## configuration options.
 ## If you need more, please extract and create PR.
