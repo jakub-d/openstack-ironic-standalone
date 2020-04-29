@@ -89,6 +89,26 @@ spec:
               name: host-dev
             {{- end }}
       initContainers:
+        - name: storage-dir-permissions
+          image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
+          command: ["/bin/bash"]
+          args: ["-c", "chown -R ironic:ironic /storage/httpboot /storage/tftpboot /storage/mgmt-scripts; chmod 1777 /storage/*; chown 1001 /mnt/mariadb"]
+          securityContext:
+            runAsUser: 0
+            fsGroup: 0
+          volumeMounts:
+            - mountPath: /storage/httpboot
+              name: ironic
+              subPath: httpboot
+            - mountPath: /storage/tftpboot
+              name: ironic
+              subPath: tftpboot
+            - mountPath: /storage/mgmt-scripts
+              name: ironic
+              subPath: mgmt-scripts
+            - mountPath: /mnt/mariadb
+              name: ironic
+              subPath: "{{ .Values.mariadb.master.persistence.subPath }}"
         - name: wait-for-mariadb
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
           command:
@@ -117,26 +137,6 @@ spec:
               name: ironic-scripts
               subPath: wait-for-mariadb.sh
               readOnly: true
-        - name: storage-dir-permissions
-          image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
-          command: ["/bin/bash"]
-          args: ["-c", "chown -R ironic:ironic /storage/httpboot /storage/tftpboot /storage/mgmt-scripts; chmod 1777 /storage/*; chown 1001 /mnt/mariadb"]
-          securityContext:
-            runAsUser: 0
-            fsGroup: 0
-          volumeMounts:
-            - mountPath: /storage/httpboot
-              name: ironic
-              subPath: httpboot
-            - mountPath: /storage/tftpboot
-              name: ironic
-              subPath: tftpboot
-            - mountPath: /storage/mgmt-scripts
-              name: ironic
-              subPath: mgmt-scripts
-            - mountPath: /mnt/mariadb
-              name: ironic
-              subPath: "{{ .Values.mariadb.master.persistence.subPath }}"
         - name: update-database-schema
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
           command:
