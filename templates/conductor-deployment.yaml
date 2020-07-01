@@ -85,8 +85,13 @@ spec:
               name: ironic-etc
               readOnly: true
             {{- if .Values.conductor.privileged }}
+            - mountPath: /sys
+              name: host-sys
             - mountPath: /dev
               name: host-dev
+            - mountPath: /lib/modules
+              name: host-lib-modules
+              readOnly: True
             {{- end }}
       initContainers:
         - name: storage-dir-permissions
@@ -196,4 +201,10 @@ spec:
             path: /dev
           type: Directory
           readOnly: false
+        - name: host-lib-modules
+          hostPath:
+            path: /lib/modules
+        - name: host-sys
+          hostPath:
+            path: /sys
         {{- end }}
