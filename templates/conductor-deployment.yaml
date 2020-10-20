@@ -100,7 +100,6 @@ spec:
           args: ["-c", "chown -R ironic:ironic /storage/httpboot /storage/tftpboot /storage/mgmt-scripts; chmod 1777 /storage/*; chown 1001 /mnt/mariadb"]
           securityContext:
             runAsUser: 0
-            fsGroup: 0
           volumeMounts:
             - mountPath: /storage/httpboot
               name: ironic

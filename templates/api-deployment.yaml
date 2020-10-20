@@ -25,12 +25,6 @@ spec:
       annotations:
         configmap-etc-hash: {{ include (print $.Template.BasePath "/etc-configmap.yaml") . | sha256sum }}
     spec:
-      template:
-        metadata:
-          labels:
-            app: {{ include "openstackIronicStandalone.name" . }}
-            component: {{ .Values.api.name }}
-            release: {{ .Release.Name }}
       containers:
         - name: {{ include "openstackIronicStandalone.api.fullname" . }}
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
