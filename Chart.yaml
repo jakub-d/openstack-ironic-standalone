@@ -1,6 +1,6 @@
 apiVersion: v1
 name: openstack-ironic-standalone
-version: 1.1.14
+version: 1.1.15
 appVersion: train
 description: Openstack Ironic chart for Kubernetes
 home: https://docs.openstack.org/ironic/latest/
