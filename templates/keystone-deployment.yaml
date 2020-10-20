@@ -26,12 +26,6 @@ spec:
       annotations:
         configmap-etc-hash: {{ include (print $.Template.BasePath "/etc-configmap.yaml") . | sha256sum }}
     spec:
-      template:
-        metadata:
-          labels:
-            app: {{ include "openstackIronicStandalone.name" . }}
-            component: {{ .Values.keystone.name }}
-            release: {{ .Release.Name }}
       initContainers:
         - name: wait-for-mariadb
           image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
