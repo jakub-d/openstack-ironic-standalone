@@ -198,8 +198,7 @@ spec:
         - name: host-dev
           hostPath:
             path: /dev
-          type: Directory
-          readOnly: false
+            type: Directory
         - name: host-lib-modules
           hostPath:
             path: /lib/modules
