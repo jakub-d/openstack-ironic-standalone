@@ -32,6 +32,7 @@ spec:
             - rsync
             - --ignore-missing-args
             - "/usr/share/syslinux/pxelinux.0"
+            - "/usr/share/syslinux/chain.c32"
             - "/usr/share/ipxe/ipxe.efi"
             - "/usr/share/ipxe/undionly.kpxe"
             - "/usr/share/syslinux/custom-ipxe.efi"
