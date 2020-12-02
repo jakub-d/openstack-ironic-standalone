@@ -1,0 +1,12 @@
+stages:
+    - build
+
+deploy_review:
+    stage: build
+    image: devth/helm
+    tags:
+      - docker
+    script:
+        - helm registry login gitlab.lab5g.local:5050 -u root -p v3jwCcWifNDjvJ28uB2r
+        - helm chart save ./ gitlab.lab5g.local:5050/root/openstack-ironic-standalone:1.1.16
+        - helm chart push gitlab.lab5g.local:5050/root/openstack-ironic-standalone:1.1.16
