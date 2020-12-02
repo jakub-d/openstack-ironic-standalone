@@ -6,7 +6,7 @@ variables:
 
 chartbuild:
     stage: build
-    image: gitlab.lab5g.local:5050/root/helm-docker
+    image: gitlab.lab5g.local:5050/root/helm-docker:latest
     tags:
       - docker
     script:
