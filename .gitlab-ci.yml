@@ -10,6 +10,8 @@ chartbuild:
     tags:
       - docker
     script:
+        - wget http://builder.lab5g.local/intermediate_ca.crt -O /usr/local/share/ca-certificates/intermediate_ca.crt
+        - update-ca-certificates
         - helm registry login gitlab.lab5g.local:5050 -u root -p v3jwCcWifNDjvJ28uB2r
         - helm chart save ./ gitlab.lab5g.local:5050/root/openstack-ironic-standalone:1.1.16
         - helm chart push gitlab.lab5g.local:5050/root/openstack-ironic-standalone:1.1.16
