@@ -1,10 +1,7 @@
 stages:
     - build
 
-variables:
-  HELM_EXPERIMENTAL_OCI: 1
-
-chartbuild:
+deploy_review:
     stage: build
     image: devth/helm
     tags:
